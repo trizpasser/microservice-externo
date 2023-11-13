@@ -49,7 +49,7 @@ def obter_cobranca_route(idCobranca):
 
 @app.route('/validaCartaoDeCredito', methods=['POST'])
 def validar_cartao_de_credito_route():
-
+    # faltando
     return 1
 
 if __name__ == '__main__':

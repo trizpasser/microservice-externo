@@ -102,7 +102,7 @@ def processa_cobrancas_atrasadas():
     try:
         fila = Fila()
 
-        while fila.confere_se_vazia != None:
+        while fila.confere_se_vazia() != None:
             cobranca_pendente = fila.obtem_cobranca()
         
             valor = cobranca_pendente["valor"]
@@ -111,7 +111,7 @@ def processa_cobrancas_atrasadas():
             realiza_cobranca(valor, ciclista)
 
         else: 
-            return "Todas as cobrancas foram quitadas."
+            return "Todas as cobrancas foram quitadas!"
 
     except ValueError as e:
         resposta_erro = {
