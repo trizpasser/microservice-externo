@@ -5,21 +5,21 @@ project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
 sys.path.insert(0, project_root)
 
 from service.EmailService import envia_email
-from service.CobrancaService import realiza_cobranca, insere_cobranca_na_fila, processa_cobrancas_atrasadas, obtem_cobranca
+from service.CobrancaService import realiza_cobranca, insere_cobranca_na_fila, processa_cobrancas_atrasadas, obtem_cobranca, valida_cartao
 
 app = Flask(__name__)
 
 #cobranca_service = Cobranca()
 
 @app.route('/enviarEmail', methods=['POST'])
-def enviar_email_route():
+def enviar_email():
     destinatario = request.form.get('destinatario')
     
     resultado_envio = envia_email(destinatario)
     return resultado_envio
 
 @app.route('/cobranca', methods=['POST'])
-def realizar_cobranca_route():
+def realizar_cobranca():
     valor = float(request.form.get('valor'))
     ciclista = (request.form.get('ciclista')) 
     
@@ -27,13 +27,13 @@ def realizar_cobranca_route():
     return resultado_cobranca
 
 @app.route('/processaCobrancasEmFila', methods=['POST'])
-def processar_cobranca_em_fila_route():    
+def processar_cobranca_em_fila():    
     
     resultado_processamento = processa_cobrancas_atrasadas()
     return resultado_processamento
 
 @app.route('/filaCobranca', methods=['POST'])
-def inserir_cobranca_em_fila_route():
+def inserir_cobranca_em_fila():
     valor = float(request.form.get('valor'))
     ciclista = (request.form.get('ciclista'))
     
@@ -41,16 +41,18 @@ def inserir_cobranca_em_fila_route():
     return resultado_insercao
 
 @app.route('/cobranca/<int:idCobranca>', methods=['GET'])
-def obter_cobranca_route(idCobranca):
+def obter_cobranca(idCobranca):
 
-    resultado_obtencao: obtem_cobranca(idCobranca)
+    resultado_obtencao = obtem_cobranca(idCobranca)
     return resultado_obtencao
 
 
 @app.route('/validaCartaoDeCredito', methods=['POST'])
-def validar_cartao_de_credito_route():
-    # faltando
-    return 1
+def validar_cartao():
+    cartao = (request.form.get('cartao'))
+    
+    resultado_validacao = valida_cartao(cartao)
+    return resultado_validacao
 
 if __name__ == '__main__':
     app.run(port=int(os.environ.get("PORT", 4000)),host='0.0.0.0',debug=True)

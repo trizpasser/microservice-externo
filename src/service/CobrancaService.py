@@ -64,6 +64,31 @@ def realiza_cobranca(valor, ciclista):
         }
         return jsonify(resposta_erro), 422
     
+
+    
+def processa_cobrancas_atrasadas():
+    try:
+        fila = Fila()
+
+        while fila.confere_se_vazia() != None:
+            cobranca_pendente = fila.obtem_cobranca()
+        
+            valor = cobranca_pendente["valor"]
+            ciclista = cobranca_pendente["ciclista"]
+
+            realiza_cobranca(valor, ciclista)
+
+        else: 
+            return "Todas as cobrancas foram quitadas!"
+
+    except ValueError as e:
+        resposta_erro = {
+            "codigo": 422,
+            "mensagem": str(e)
+        }
+        return jsonify(resposta_erro), 422
+    
+    
 def insere_cobranca_na_fila(valor, ciclista):
     try: 
         if valor <= 0 or valor is None or ciclista is None:
@@ -90,35 +115,66 @@ def insere_cobranca_na_fila(valor, ciclista):
 
         return jsonify("Cobranca pendente registrada!", cobranca)
     
-    except ValueError as e:
-        resposta_erro = {
-            "codigo": 422,
-            "mensagem": str(e)
-        }
-        return jsonify(resposta_erro), 422
+    except:   
+        response_mock = Mock()
+        response_mock.status_code = 404
+        response_mock.json.return_value = [
+            {
+                "codigo": 404,
+                "mensagem": "Não encontrado."
+            }
+        ]
+
+    return response_mock.json()
 
 
-def processa_cobrancas_atrasadas():
+
+def obtem_cobranca(idCobranca):
+    cobrancas = lista_cobrancas()
+
     try:
-        fila = Fila()
+        for cobranca in cobrancas:
+            if cobranca['id'] == idCobranca:
+                return cobranca
+    except:   
+        response_mock = Mock()
+        response_mock.status_code = 404
+        response_mock.json.return_value = [
+            {
+                "codigo": 404,
+                "mensagem": "Não encontrado."
+            }
+        ]
 
-        while fila.confere_se_vazia() != None:
-            cobranca_pendente = fila.obtem_cobranca()
+    return response_mock.json()
+
+
+
+def valida_cartao(cartao):
+    try:
+        if cartao: # retorno simulado do processo de conferencia do cartao 
+            valido = True
+        else:
+            valido = False
+
+        if valido is True:
+            return "Cartao validado com sucesso!", 200
+
+        else:
+            return "Cartao invalido", 422
         
-            valor = cobranca_pendente["valor"]
-            ciclista = cobranca_pendente["ciclista"]
+    except:
+        response_mock = Mock()
+        response_mock.status_code = 422
+        response_mock.json.return_value = [
+            {
+                "codigo": 422,
+                "mensagem": "Dados inválidos."
+            }
+        ]
 
-            realiza_cobranca(valor, ciclista)
+    return response_mock.json()
 
-        else: 
-            return "Todas as cobrancas foram quitadas!"
-
-    except ValueError as e:
-        resposta_erro = {
-            "codigo": 422,
-            "mensagem": str(e)
-        }
-        return jsonify(resposta_erro), 422
 
 def agenda_processamento_de_cobranca():
     schedule.every().day.at("00:00").do(processa_cobrancas_atrasadas)
@@ -128,23 +184,7 @@ def agenda_processamento_de_cobranca():
         schedule.run_pending()
         time.sleep(1)
 
-def obtem_cobranca(idCobranca):
-    cobrancas = lista_cobrancas()
 
-    for cobranca in cobrancas:
-        if cobranca['id'] == idCobranca:
-            return cobranca
-        
-    response_mock = Mock()
-    response_mock.status_code = 422
-    response_mock.json.return_value = [
-        {
-            "codigo": 404,
-            "mensagem": "Não encontrado."
-        }
-    ]
-
-    return response_mock.json()
 
 class Fila():
 
