@@ -6,8 +6,11 @@ sys.path.insert(0, project_root)
 
 from service.EmailService import envia_email
 from service.CobrancaService import realiza_cobranca
+from service.CobrancaService import insere_cobranca_na_fila
 
 app = Flask(__name__)
+
+#cobranca_service = Cobranca()
 
 @app.route('/enviarEmail', methods=['POST'])
 def enviar_email_route():
@@ -19,13 +22,21 @@ def enviar_email_route():
 @app.route('/cobranca', methods=['POST'])
 def realizar_cobranca_route():
     valor = float(request.form.get('valor'))
-    ciclista_id = int(request.form.get('ciclista_id')) #id não é int mudar isso aqui
+    ciclista = (request.form.get('ciclista')) #id não é int mudar isso aqui
     
-    resultado_cobranca = realiza_cobranca(valor, ciclista_id)
+    resultado_cobranca = realiza_cobranca(valor, ciclista)
     return resultado_cobranca
 
+@app.route('/filaCobranca', methods=['POST'])
+def inserir_cobranca_em_fila_route():
+    valor = float(request.form.get('valor'))
+    ciclista = (request.form.get('ciclista'))
+    
+    resultado_insercao = insere_cobranca_na_fila(valor, ciclista)
+    return resultado_insercao
+
 @app.route('/processaCobrancasEmFila', methods=['POST'])
-def processar_cobranca_em_fila_router():    
+def processar_cobranca_em_fila_route():    
     return 1
 
 if __name__ == '__main__':
