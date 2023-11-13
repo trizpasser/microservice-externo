@@ -37,7 +37,3 @@ def envia_email(destinatario):
     except Exception as e:
         logging.error(f"Erro ao enviar e-mail para {destinatario}: {str(e)}")
         return f"Erro ao enviar e-mail: {str(e)}"
-
-    #    return 'E-mail enviado.'
-    #except Exception as e:
-    #    return f"Erro ao enviar e-mail: {str(e)}"

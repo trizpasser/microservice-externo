@@ -1,7 +1,5 @@
-from flask import request 
-from flask import jsonify
-from datetime import datetime
-from datetime import timedelta
+from flask import request, jsonify
+from datetime import datetime, timedelta
 import random
 
 def realiza_cobranca(valor, ciclista_id):
@@ -43,3 +41,11 @@ def realiza_cobranca(valor, ciclista_id):
         }
         return jsonify(resposta_erro), 422
 
+def obtem_cobranca():
+    return 1
+
+def processa_cobrancas_atrasadas():
+    return 1
+
+def insere_cobranca_na_fila():
+    return 1
