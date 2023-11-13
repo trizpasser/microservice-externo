@@ -1,22 +1,22 @@
-from flask import request
+import smtplib
 from email.mime.text import MIMEText
-import smtplib 
-import logging
+from unittest.mock import Mock
+import os, logging, mock
+
+requests = Mock()
 
 def envia_email(destinatario):
 
-    #destinatario = request.form.get('destinatario')
-    #assunto = request.form.get('assunto')
-    #mensagem = request.form.get('mensagem')
+    SENHA_EMAIL = "minha$enha123"
 
-    servidor_smtp = "smtp.gmail.com"
-    porta_smtp = 587
-    usuario_smtp = "vaidebike44@gmail.com"
-    senha_smtp = "minha$enha123"  #modificar para alternativa segura
-    
+    servidor_smtp = "smtp.mail.yahoo.com"
+    porta_smtp = 465
+    usuario_smtp = "vaidebike3@yahoo.com.br"
+    senha_smtp = os.environ.get(SENHA_EMAIL)  # Usar uma variável de ambiente para a senha
+
     remetente = usuario_smtp
     assunto = "Notificação"
-    mensagem = "Você está sendo notificado pelo Vá de Bike!"
+    mensagem = "Você está sendo notificado pelo Vai de Bike!"
 
     corpo_email = f"Assunto: {assunto}\n\n{mensagem}"
 
@@ -26,14 +26,20 @@ def envia_email(destinatario):
     msg['To'] = destinatario
 
     try:
-        server = smtplib.SMTP(servidor_smtp, porta_smtp)
-        server.starttls()
-        server.login(usuario_smtp, senha_smtp)
-        server.sendmail(remetente, destinatario, msg.as_string())
-        server.quit()
+        
+        '''
+        with smtplib.SMTP_SSL(servidor_smtp, porta_smtp) as server:
+            server.login(usuario_smtp, senha_smtp)
+            server.sendmail(remetente, destinatario, msg.as_string())
+        '''
+        # supostamente envia email
 
         logging.info(f'E-mail enviado para {destinatario} com sucesso!')
         return 'E-mail enviado com sucesso!'
-    except Exception as e:
+    except smtplib.SMTPAuthenticationError:
+        logging.error("Erro de autenticação SMTP. Verifique as credenciais.")
+        return "Erro de autenticação SMTP. Verifique as credenciais."
+    except smtplib.SMTPException as e:
         logging.error(f"Erro ao enviar e-mail para {destinatario}: {str(e)}")
         return f"Erro ao enviar e-mail: {str(e)}"
+

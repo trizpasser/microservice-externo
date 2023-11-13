@@ -1,7 +1,35 @@
-from flask import request, jsonify
+from flask import jsonify
 from queue import Queue
+from unittest.mock import Mock
 from datetime import datetime, timedelta
-import random
+import random, schedule, time, mock
+
+requests = Mock()
+
+def lista_cobrancas():
+    response_mock = Mock()
+    response_mock.status_code = 200
+    response_mock.json.return_value = [
+            {
+                "id": 1,
+                "ciclista": "123",
+                "status": "Pago",
+                "horaSolicitacao": "2023-11-13 02:14:39",
+                "horaFinalizacao": "2023-11-13 02:19:39",
+                "valor": 20.0
+            },
+            {
+                "id": 2,
+                "ciclista": "456",
+                "status": "Pago",
+                "horaSolicitacao": "2023-11-13 02:14:39",
+                "horaFinalizacao": "2023-11-13 02:19:39",
+                "valor": 35.5
+            },
+        ]
+    
+
+    return response_mock.json()
 
 def realiza_cobranca(valor, ciclista):
     try: 
@@ -23,6 +51,8 @@ def realiza_cobranca(valor, ciclista):
             "valor": valor,
             "ciclista": ciclista
         }
+
+        # aqui supostamente guarda a cobrança no bd
 
         return jsonify(resposta), 200
 
@@ -48,7 +78,7 @@ def insere_cobranca_na_fila(valor, ciclista):
             "id": cobranca_id,
             "status": status,
             "horaSolicitacao": hora_solicitacao,
-            "horaFinalizacao": None, 
+            "horaFinalizacao": "-", 
             "valor": valor,
             "ciclista": ciclista
         }
@@ -56,7 +86,9 @@ def insere_cobranca_na_fila(valor, ciclista):
         fila = Fila()
         fila.insere_cobranca(cobranca)
 
-        return "Cobrança pendente registrada.", cobranca
+        agenda_processamento_de_cobranca
+
+        return jsonify("Cobranca pendente registrada!", cobranca)
     
     except ValueError as e:
         resposta_erro = {
@@ -66,12 +98,53 @@ def insere_cobranca_na_fila(valor, ciclista):
         return jsonify(resposta_erro), 422
 
 
-
-def obtem_cobranca():
-    return 1
-
 def processa_cobrancas_atrasadas():
-    return 1
+    try:
+        fila = Fila()
+
+        while fila.confere_se_vazia != None:
+            cobranca_pendente = fila.obtem_cobranca()
+        
+            valor = cobranca_pendente["valor"]
+            ciclista = cobranca_pendente["ciclista"]
+
+            realiza_cobranca(valor, ciclista)
+
+        else: 
+            return "Todas as cobrancas foram quitadas."
+
+    except ValueError as e:
+        resposta_erro = {
+            "codigo": 422,
+            "mensagem": str(e)
+        }
+        return jsonify(resposta_erro), 422
+
+def agenda_processamento_de_cobranca():
+    schedule.every().day.at("00:00").do(processa_cobrancas_atrasadas)
+    schedule.every().day.at("12:00").do(processa_cobrancas_atrasadas)
+
+    while True:
+        schedule.run_pending()
+        time.sleep(1)
+
+def obtem_cobranca(idCobranca):
+    cobrancas = lista_cobrancas()
+
+    for cobranca in cobrancas:
+        if cobranca['id'] == idCobranca:
+            return cobranca
+        
+    response_mock = Mock()
+    response_mock.status_code = 422
+    response_mock.json.return_value = [
+        {
+            "codigo": 404,
+            "mensagem": "Não encontrado."
+        }
+    ]
+
+    return response_mock.json()
 
 class Fila():
 
@@ -84,11 +157,10 @@ class Fila():
     def insere_cobranca(self, cobranca):
         self.fila_cobrancas_pendentes.put(cobranca)
 
-    def obtem_e_remove_proximo_elemento(self):
-        if not self.fila_cobrancas_pendentes.empty():
-            proximo_elemento = self.fila_cobrancas_pendentes.get()
-            return proximo_elemento
-        else:
-            return None  # Fila vazia
-    
+    def confere_se_vazia(self):
+        if self.fila_cobrancas_pendentes.empty():
+            return None
+
+    def obtem_cobranca(self):
+        return self.fila_cobrancas_pendentes.get()
 
