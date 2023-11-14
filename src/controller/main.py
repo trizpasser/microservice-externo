@@ -13,7 +13,7 @@ from service.CobrancaService import realiza_cobranca, insere_cobranca_na_fila, p
 app = Flask(__name__)
 requests = Mock()
 
-'''
+
 # config do SONAR do problema de CSRF
 csrf = CSRFProtect(app)
 csrf.init_app(app)
@@ -27,7 +27,6 @@ def get_csrf_token():
     return token, 200
 #####################################
 
-'''
 
 @app.route('/', methods=['GET'])
 def hello_world():
