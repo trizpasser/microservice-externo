@@ -18,9 +18,8 @@ class TestMain(unittest.TestCase):
             "assunto": "teste",
             "mensagem": "teste",
         }
-        token = "None"
         with app.test_client() as client:
             response = client.get('/get_csrf_token')
             token = response.get_data(as_text=True)
-            response = client.post('/bicicleta', headers={"Content-Type": "application/json", "X-CSRFToken": token}, json=data)
+            response = client.post('/enviaEmail', headers={"Content-Type": "application/json", "X-CSRFToken": token}, json=data)
             self.assertEqual(response.status_code, mock_enviar_email.status_code)

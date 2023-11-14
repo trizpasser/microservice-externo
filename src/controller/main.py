@@ -36,7 +36,7 @@ def hello_world():
 
 @app.route('/enviarEmail', methods=['POST'])
 def enviar_email_route():
-    email = request.form.get('email')
+    email = str(request.form.get('email'))
     assunto = request.form.get('assunto')
     mensagem = request.form.get('mensagem')
 
@@ -66,10 +66,10 @@ def inserir_cobranca_em_fila_route():
     resultado_insercao = insere_cobranca_na_fila(valor, ciclista)
     return resultado_insercao
 
-@app.route('/cobranca/<int:idCobranca>', methods=['GET'])
-def obter_cobranca_route(idCobranca):
+@app.route('/cobranca/<int:id_cobranca>', methods=['GET'])
+def obter_cobranca_route(id_cobranca):
 
-    resultado_obtencao = obtem_cobranca(idCobranca)
+    resultado_obtencao = obtem_cobranca(id_cobranca)
     return resultado_obtencao
 
 

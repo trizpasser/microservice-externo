@@ -1,5 +1,3 @@
-#import smtplib
-#from email.mime.text import MIMEText
 from unittest.mock import Mock
 import re #,os, logging
 
@@ -8,7 +6,15 @@ requests = Mock()
 def envia_email(email, assunto, mensagem):
     response_mock = Mock()
     response_mock.status_code = "Email enviado", 200
-    response_mock.json.return_value = "Email enviado com sucesso!"
+   
+    response_mock.json.return_value = [
+        {
+            "msg": "Email enviado com sucesso!",
+            "email": email,
+            "assunto": assunto,
+            "mensagem": mensagem,
+        }
+    ]
 
     regex = r'\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,7}\b' # expressão para validar o formato do email
 

@@ -78,9 +78,8 @@ def processa_cobrancas_pendentes():
 
         realiza_cobranca(valor, ciclista)
 
-    else: 
-        response_mock.json.return_value = "Todas as cobrancas foram quitadas!"
-
+    response_mock.json.return_value = "Todas as cobrancas foram quitadas!"
+        
     return response_mock.json()
     
     
@@ -101,7 +100,6 @@ def insere_cobranca_na_fila(valor, ciclista):
     cobranca_id = random.randint(1,1000) # gera id aleatorio
     status = "Pendente"
     hora_solicitacao = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-    # hora_finalizacao = None  # Ainda não finalizada
 
     response_mock.json.return_value = {
         "id": cobranca_id,
@@ -115,17 +113,15 @@ def insere_cobranca_na_fila(valor, ciclista):
     fila = Fila()
     fila.insere_cobranca(response_mock.json())
 
-    #agenda_processamento_de_cobranca()
-
     return response_mock.json()
 
 
-def obtem_cobranca(idCobranca):
+def obtem_cobranca(id_cobranca):
     cobrancas = lista_cobrancas()
 
     for cobranca in cobrancas:
-        if cobranca['id'] == idCobranca:
-            return True
+        if cobranca['id'] == id_cobranca:
+            return cobranca
  
     response_mock = Mock()
     response_mock.status_code = 404
@@ -139,36 +135,28 @@ def obtem_cobranca(idCobranca):
     return response_mock.json()
 
 
-
 def valida_cartao(cartao):
+    response_mock = Mock()
+    response_mock.status_code = "Cartão validado", 200
+    response_mock.json.return_value = "Dados atualizados!"
+    
     if cartao: # retorno simulado do processo de conferencia do cartao 
         valido = True
 
     if valido is True:
-        return True
+        return response_mock.json()
 
-    response_mock = Mock()
+    
     response_mock.status_code = 422
     response_mock.json.return_value = [
         {
             "codigo": 422,
-            "mensagem": "Dados inválidos."
+            "mensagem": "Dados inválido."
         }
     ]
 
     return response_mock.json()
 
-'''
-
-def agenda_processamento_de_cobranca():
-    schedule.every().day.at("00:00").do(processa_cobrancas_atrasadas)
-    schedule.every().day.at("12:00").do(processa_cobrancas_atrasadas)
-
-    while True:
-        schedule.run_pending()
-        time.sleep(1)
-
-'''
 
 class Fila():
 
