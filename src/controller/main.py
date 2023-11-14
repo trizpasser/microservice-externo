@@ -32,7 +32,6 @@ def get_csrf_token():
 def hello_world():
     return "Hello World! :)"
 
-#'''
 @app.route('/enviarEmail', methods=['POST'])
 def enviar_email_route():
     data = request.json
