@@ -13,6 +13,7 @@ from service.CobrancaService import realiza_cobranca, insere_cobranca_na_fila, p
 app = Flask(__name__)
 requests = Mock()
 
+'''
 # config do SONAR do problema de CSRF
 csrf = CSRFProtect(app)
 csrf.init_app(app)
@@ -26,6 +27,8 @@ def get_csrf_token():
     return token, 200
 #####################################
 
+'''
+
 @app.route('/enviarEmail', methods=['POST'])
 def enviar_email_route():
     email = request.form.get('email')
@@ -34,6 +37,7 @@ def enviar_email_route():
 
     resultado_envio = envia_email(email, assunto, mensagem)
     return resultado_envio
+
 
 @app.route('/cobranca', methods=['POST'])
 def realizar_cobranca_route():

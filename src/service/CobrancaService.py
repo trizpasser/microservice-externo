@@ -1,7 +1,7 @@
 from queue import Queue
 from unittest.mock import Mock
 from datetime import datetime, timedelta
-import random, schedule, time
+import random
 
 requests = Mock()
 
