@@ -135,16 +135,13 @@ def obtem_cobranca(id_cobranca):
     return response_mock.json()
 
 
-def valida_cartao(cartao):
+def valida_cartao(nome_titular, numero, validade, cvv):
     response_mock = Mock()
     response_mock.status_code = "Cartão validado", 200
     response_mock.json.return_value = "Dados atualizados!"
     
-    if cartao: # retorno simulado do processo de conferencia do cartao 
-        valido = True
-
-    if valido is True:
-        return response_mock.json()
+    if nome_titular and numero and validade and cvv: # retorno simulado do processo de conferencia do cartao 
+         return response_mock.json()
 
     
     response_mock.status_code = 422

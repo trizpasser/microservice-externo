@@ -13,7 +13,7 @@ from service.CobrancaService import realiza_cobranca, insere_cobranca_na_fila, p
 app = Flask(__name__)
 requests = Mock()
 
-
+'''
 # config do SONAR do problema de CSRF
 csrf = CSRFProtect(app)
 csrf.init_app(app)
@@ -26,27 +26,25 @@ def get_csrf_token():
     token = generate_csrf()
     return token, 200
 #####################################
-
+'''
 
 @app.route('/', methods=['GET'])
 def hello_world():
     return "Hello World! :)"
 
-
+#'''
 @app.route('/enviarEmail', methods=['POST'])
 def enviar_email_route():
-    email = str(request.form.get('email'))
-    assunto = request.form.get('assunto')
-    mensagem = request.form.get('mensagem')
+    data = request.json
+    email, assunto, mensagem = data.get('email'), data.get('assunto'), data.get('mensagem')
 
     resultado_envio = envia_email(email, assunto, mensagem)
     return resultado_envio
 
-
 @app.route('/cobranca', methods=['POST'])
 def realizar_cobranca_route():
-    valor = float(request.form.get('valor'))
-    ciclista = int(request.form.get('ciclista')) 
+    data = request.json
+    valor, ciclista = float(data.get('valor')), int(data.get('ciclista'))
     
     resultado_cobranca = realiza_cobranca(valor, ciclista)
     return resultado_cobranca
@@ -59,8 +57,8 @@ def processar_cobrancas_em_fila_route():
 
 @app.route('/filaCobranca', methods=['POST'])
 def inserir_cobranca_em_fila_route():
-    valor = float(request.form.get('valor'))
-    ciclista = int(request.form.get('ciclista'))
+    data = request.json
+    valor, ciclista = float(data.get('valor')), int(data.get('ciclista'))
     
     resultado_insercao = insere_cobranca_na_fila(valor, ciclista)
     return resultado_insercao
@@ -74,9 +72,10 @@ def obter_cobranca_route(id_cobranca):
 
 @app.route('/validaCartaoDeCredito', methods=['POST'])
 def validar_cartao_route():
-    cartao = (request.form.get('cartao'))
+    data = request.json
+    nome_titular, numero, validade, cvv = data.get('nome_titular'), data.get('numero'), data.get('validade'), data.get('cvv')
     
-    resultado_validacao = valida_cartao(cartao)
+    resultado_validacao = valida_cartao(nome_titular, numero, validade, cvv)
     return resultado_validacao
 
 if __name__ == '__main__':
