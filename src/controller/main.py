@@ -37,36 +37,34 @@ def enviar_email_route():
     data = request.json
     email, assunto, mensagem = data.get('email'), data.get('assunto'), data.get('mensagem')
 
-    resultado_envio = envia_email(email, assunto, mensagem)
-    return resultado_envio
+    return envia_email(email, assunto, mensagem)
 
 @app.route('/cobranca', methods=['POST'])
 def realizar_cobranca_route():
     data = request.json
     valor, ciclista = float(data.get('valor')), int(data.get('ciclista'))
     
-    resultado_cobranca = realiza_cobranca(valor, ciclista)
-    return resultado_cobranca
+    return realiza_cobranca(valor, ciclista)
+
 
 @app.route('/processaCobrancasEmFila', methods=['POST'])
 def processar_cobrancas_em_fila_route():    
     
-    resultado_processamento = processa_cobrancas_pendentes()
-    return resultado_processamento
+    return processa_cobrancas_pendentes()
+
 
 @app.route('/filaCobranca', methods=['POST'])
 def inserir_cobranca_em_fila_route():
     data = request.json
     valor, ciclista = float(data.get('valor')), int(data.get('ciclista'))
     
-    resultado_insercao = insere_cobranca_na_fila(valor, ciclista)
-    return resultado_insercao
+    return insere_cobranca_na_fila(valor, ciclista)
+
 
 @app.route('/cobranca/<int:id_cobranca>', methods=['GET'])
 def obter_cobranca_route(id_cobranca):
 
-    resultado_obtencao = obtem_cobranca(id_cobranca)
-    return resultado_obtencao
+    return obtem_cobranca(id_cobranca)
 
 
 @app.route('/validaCartaoDeCredito', methods=['POST'])
@@ -74,8 +72,8 @@ def validar_cartao_route():
     data = request.json
     nome_titular, numero, validade, cvv = data.get('nome_titular'), data.get('numero'), data.get('validade'), data.get('cvv')
     
-    resultado_validacao = valida_cartao(nome_titular, numero, validade, cvv)
-    return resultado_validacao
+    return valida_cartao(nome_titular, numero, validade, cvv)
+
 
 if __name__ == '__main__':
     app.run(port=int(os.environ.get("PORT", 8080)),host='0.0.0.0',debug=True)

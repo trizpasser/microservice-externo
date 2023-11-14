@@ -21,6 +21,7 @@ class TestEmailService(unittest.TestCase):
         }
         mock_request.return_value = response_mock
         result = envia_email(email, assunto, mensagem)
+        print(result.text)
         self.assertEqual(result['email'], email)  
         self.assertEqual(result['mensagem'], mensagem)
 

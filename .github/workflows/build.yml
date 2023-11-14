@@ -23,6 +23,10 @@ jobs:
         run: |
           pip install Flask gunicorn requests mock flask_wtf coverage
 
+      - name: Run tests and coverage
+        run: |
+          coverage run src/tests/email_test.py
+
       - name: SonarCloud Scan
         uses: SonarSource/sonarcloud-github-action@master
         env:
