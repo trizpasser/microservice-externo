@@ -34,7 +34,7 @@ def realiza_cobranca(valor, ciclista):
     response_mock = Mock()
     response_mock.status_code = "Cobrança realizada", 200
 
-    if valor <= 0 or valor is None or ciclista is None or ciclista <= 0:
+    if valor <= 0 or valor is None or ciclista is None:
         response_mock.status_code = 422
         response_mock.json.return_value = [
         {
@@ -87,7 +87,7 @@ def insere_cobranca_na_fila(valor, ciclista):
     response_mock = Mock()
     response_mock.status_code = "Cobrança inserida na fila", 200
 
-    if valor <= 0 or valor is None or ciclista is None or ciclista <= 0:
+    if valor <= 0 or valor is None or ciclista is None:
         response_mock.status_code = 422
         response_mock.json.return_value = [
         {
