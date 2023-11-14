@@ -11,16 +11,32 @@ from service.EmailService import envia_email
 from service.CobrancaService import realiza_cobranca, insere_cobranca_na_fila, processa_cobrancas_pendentes, obtem_cobranca, valida_cartao
 
 app = Flask(__name__)
+requests = Mock()
+
+# config do SONAR do problema de CSRF
+csrf = CSRFProtect(app)
+csrf.init_app(app)
+app.config['SECRET_KEY'] = 'teste123'
+#####################################
+
+# config do SONAR do problema de CSRF
+@app.route('/get_csrf_token', methods=['GET'])
+def get_csrf_token():
+    token = generate_csrf()
+    return token, 200
+#####################################
 
 @app.route('/enviarEmail', methods=['POST'])
-def enviar_email():
-    destinatario = request.form.get('destinatario')
-    
-    resultado_envio = envia_email(destinatario)
+def enviar_email_route():
+    email = request.form.get('email')
+    assunto = request.form.get('assunto')
+    mensagem = request.form.get('mensagem')
+
+    resultado_envio = envia_email(email, assunto, mensagem)
     return resultado_envio
 
 @app.route('/cobranca', methods=['POST'])
-def realizar_cobranca():
+def realizar_cobranca_route():
     valor = float(request.form.get('valor'))
     ciclista = int(request.form.get('ciclista')) 
     
@@ -28,13 +44,13 @@ def realizar_cobranca():
     return resultado_cobranca
 
 @app.route('/processaCobrancasEmFila', methods=['POST'])
-def processar_cobrancas_em_fila():    
+def processar_cobrancas_em_fila_route():    
     
     resultado_processamento = processa_cobrancas_pendentes()
     return resultado_processamento
 
 @app.route('/filaCobranca', methods=['POST'])
-def inserir_cobranca_em_fila():
+def inserir_cobranca_em_fila_route():
     valor = float(request.form.get('valor'))
     ciclista = int(request.form.get('ciclista'))
     
@@ -42,19 +58,19 @@ def inserir_cobranca_em_fila():
     return resultado_insercao
 
 @app.route('/cobranca/<int:idCobranca>', methods=['GET'])
-def obter_cobranca(idCobranca):
+def obter_cobranca_route(idCobranca):
 
     resultado_obtencao = obtem_cobranca(idCobranca)
     return resultado_obtencao
 
 
 @app.route('/validaCartaoDeCredito', methods=['POST'])
-def validar_cartao():
+def validar_cartao_route():
     cartao = (request.form.get('cartao'))
     
     resultado_validacao = valida_cartao(cartao)
     return resultado_validacao
 
 if __name__ == '__main__':
-    app.run(port=int(os.environ.get("PORT", 4000)),host='0.0.0.0',debug=True)
+    app.run(port=int(os.environ.get("PORT", 8080)),host='0.0.0.0',debug=True)
 
