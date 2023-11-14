@@ -14,12 +14,9 @@ class TestMain(unittest.TestCase):
         mock_enviar_email.status_code = 200
 
         data = {
-            "email": 3,
+            "email": "teste@email.com",
             "assunto": "teste",
-            "modelo": "teste",
-            "ano": "teste",
-            "numero": "teste",
-            "status": "teste"
+            "mensagem": "teste",
         }
         token = "None"
         with app.test_client() as client:
