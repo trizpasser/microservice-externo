@@ -29,6 +29,11 @@ def get_csrf_token():
 
 '''
 
+@app.route('/', methods=['GET'])
+def hello_world():
+    return "Hello World! :)"
+
+
 @app.route('/enviarEmail', methods=['POST'])
 def enviar_email_route():
     email = request.form.get('email')
