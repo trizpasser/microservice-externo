@@ -1,8 +1,7 @@
-from flask import jsonify
 from queue import Queue
 from unittest.mock import Mock
 from datetime import datetime, timedelta
-import random, schedule, time, mock
+import random, schedule, time
 
 requests = Mock()
 
@@ -32,149 +31,134 @@ def lista_cobrancas():
     return response_mock.json()
 
 def realiza_cobranca(valor, ciclista):
-    try: 
-        if valor <= 0 or valor is None or ciclista is None:
-            raise ValueError("Os dados fornecidos são inválidos.", 400)
-        
-        # supostamente rola um processo de cobrança aqui
+    response_mock = Mock()
+    response_mock.status_code = "Cobrança realizada", 200
 
-        cobranca_id = random.randint(1,1000) # gera um id aleatorio
-        status = "Pago" # estatico, considerar mudar
-        hora_solicitacao = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-        hora_finalizacao = (datetime.now() + timedelta(minutes=5)).strftime("%Y-%m-%d %H:%M:%S") # adiciona 5min como simulação
-
-        resposta = {
-            "id": cobranca_id,
-            "status": status,
-            "horaSolicitacao": hora_solicitacao,
-            "horaFinalizacao": hora_finalizacao,
-            "valor": valor,
-            "ciclista": ciclista
-        }
-
-        # aqui supostamente guarda a cobrança no bd
-
-        return jsonify(resposta), 200
-
-    except ValueError as e:
-        # Caso dê erro deve ser add à lista de cobranças pendentes
-        resposta_erro = {
+    if valor <= 0 or valor is None or ciclista is None or ciclista <= 0:
+        response_mock.status_code = 422
+        response_mock.json.return_value = [
+        {
             "codigo": 422,
-            "mensagem": str(e)
+            "mensagem": "Dados inválidos"
         }
-        return jsonify(resposta_erro), 422
+    ]
+        return response_mock.json()
+
+    # supostamente rola um processo de cobrança aqui
+
+    cobranca_id = random.randint(1,1000) # gera um id aleatorio
+    status = "Pago" # estatico, considerar mudar
+    hora_solicitacao = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    hora_finalizacao = (datetime.now() + timedelta(minutes=5)).strftime("%Y-%m-%d %H:%M:%S") # adiciona 5min como simulação
+
+    response_mock.json.return_value = {
+        "id": cobranca_id,
+        "status": status,
+        "horaSolicitacao": hora_solicitacao,
+        "horaFinalizacao": hora_finalizacao,
+        "valor": valor,
+        "ciclista": ciclista
+    }
+
+    return response_mock.json()
     
 
     
-def processa_cobrancas_atrasadas():
-    try:
-        fila = Fila()
+def processa_cobrancas_pendentes():
+    response_mock = Mock()
+    response_mock.status_code = "Cobranças pendentes processadas", 200
+    
+    fila = Fila()
 
-        while fila.confere_se_vazia() != None:
-            cobranca_pendente = fila.obtem_cobranca()
-        
-            valor = cobranca_pendente["valor"]
-            ciclista = cobranca_pendente["ciclista"]
+    while fila.confere_se_vazia() != None:
+        cobranca_pendente = fila.obtem_cobranca()
+    
+        valor = cobranca_pendente["valor"]
+        ciclista = cobranca_pendente["ciclista"]
 
-            realiza_cobranca(valor, ciclista)
+        realiza_cobranca(valor, ciclista)
 
-        else: 
-            return "Todas as cobrancas foram quitadas!"
+    else: 
+        response_mock.json.return_value = "Todas as cobrancas foram quitadas!"
 
-    except ValueError as e:
-        resposta_erro = {
-            "codigo": 422,
-            "mensagem": str(e)
-        }
-        return jsonify(resposta_erro), 422
+    return response_mock.json()
     
     
 def insere_cobranca_na_fila(valor, ciclista):
-    try: 
-        if valor <= 0 or valor is None or ciclista is None:
-            raise ValueError("Os dados fornecidos são inválidos.", 400)
-        
-        cobranca_id = random.randint(1,1000) # gera id aleatorio
-        status = "Pendente"
-        hora_solicitacao = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-        # hora_finalizacao = None  # Ainda não finalizada
+    response_mock = Mock()
+    response_mock.status_code = "Cobrança inserida na fila", 200
 
-        cobranca = {
-            "id": cobranca_id,
-            "status": status,
-            "horaSolicitacao": hora_solicitacao,
-            "horaFinalizacao": "-", 
-            "valor": valor,
-            "ciclista": ciclista
-        }
-
-        fila = Fila()
-        fila.insere_cobranca(cobranca)
-
-        agenda_processamento_de_cobranca
-
-        return jsonify("Cobranca pendente registrada!", cobranca)
-    
-    except:   
-        response_mock = Mock()
-        response_mock.status_code = 404
+    if valor <= 0 or valor is None or ciclista is None or ciclista <= 0:
+        response_mock.status_code = 422
         response_mock.json.return_value = [
-            {
-                "codigo": 404,
-                "mensagem": "Não encontrado."
-            }
-        ]
+        {
+            "codigo": 422,
+            "mensagem": "Dados inválidos"
+        }
+    ]
+        return response_mock.json()
+        
+    cobranca_id = random.randint(1,1000) # gera id aleatorio
+    status = "Pendente"
+    hora_solicitacao = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    # hora_finalizacao = None  # Ainda não finalizada
+
+    response_mock.json.return_value = {
+        "id": cobranca_id,
+        "status": status,
+        "horaSolicitacao": hora_solicitacao,
+        "horaFinalizacao": "-", 
+        "valor": valor,
+        "ciclista": ciclista
+    }
+
+    fila = Fila()
+    fila.insere_cobranca(response_mock.json())
+
+    #agenda_processamento_de_cobranca()
 
     return response_mock.json()
-
 
 
 def obtem_cobranca(idCobranca):
     cobrancas = lista_cobrancas()
 
-    try:
-        for cobranca in cobrancas:
-            if cobranca['id'] == idCobranca:
-                return cobranca
-    except:   
-        response_mock = Mock()
-        response_mock.status_code = 404
-        response_mock.json.return_value = [
-            {
-                "codigo": 404,
-                "mensagem": "Não encontrado."
-            }
-        ]
+    for cobranca in cobrancas:
+        if cobranca['id'] == idCobranca:
+            return True
+ 
+    response_mock = Mock()
+    response_mock.status_code = 404
+    response_mock.json.return_value = [
+        {
+            "codigo": 404,
+            "mensagem": "Não encontrado."
+        }
+    ]
 
     return response_mock.json()
 
 
 
 def valida_cartao(cartao):
-    try:
-        if cartao: # retorno simulado do processo de conferencia do cartao 
-            valido = True
-        else:
-            valido = False
+    if cartao: # retorno simulado do processo de conferencia do cartao 
+        valido = True
 
-        if valido is True:
-            return "Cartao validado com sucesso!", 200
+    if valido is True:
+        return True
 
-        else:
-            return "Cartao invalido", 422
-        
-    except:
-        response_mock = Mock()
-        response_mock.status_code = 422
-        response_mock.json.return_value = [
-            {
-                "codigo": 422,
-                "mensagem": "Dados inválidos."
-            }
-        ]
+    response_mock = Mock()
+    response_mock.status_code = 422
+    response_mock.json.return_value = [
+        {
+            "codigo": 422,
+            "mensagem": "Dados inválidos."
+        }
+    ]
 
     return response_mock.json()
 
+'''
 
 def agenda_processamento_de_cobranca():
     schedule.every().day.at("00:00").do(processa_cobrancas_atrasadas)
@@ -184,7 +168,7 @@ def agenda_processamento_de_cobranca():
         schedule.run_pending()
         time.sleep(1)
 
-
+'''
 
 class Fila():
 

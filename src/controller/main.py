@@ -1,15 +1,16 @@
 from flask import Flask, request
 import os, sys
+from unittest.mock import Mock
+from flask_wtf import CSRFProtect # LIB PARA CORREÇÃO DO CSRF NO SONAR -> DOC PARA TODOS OS MICROSERVICES
+from flask_wtf.csrf import generate_csrf # LIB PARA CORREÇÃO DO CSRF NO SONAR -> DOC PARA TODOS OS MICROSERVICES
 
 project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
 sys.path.insert(0, project_root)
 
 from service.EmailService import envia_email
-from service.CobrancaService import realiza_cobranca, insere_cobranca_na_fila, processa_cobrancas_atrasadas, obtem_cobranca, valida_cartao
+from service.CobrancaService import realiza_cobranca, insere_cobranca_na_fila, processa_cobrancas_pendentes, obtem_cobranca, valida_cartao
 
 app = Flask(__name__)
-
-#cobranca_service = Cobranca()
 
 @app.route('/enviarEmail', methods=['POST'])
 def enviar_email():
@@ -21,21 +22,21 @@ def enviar_email():
 @app.route('/cobranca', methods=['POST'])
 def realizar_cobranca():
     valor = float(request.form.get('valor'))
-    ciclista = (request.form.get('ciclista')) 
+    ciclista = int(request.form.get('ciclista')) 
     
     resultado_cobranca = realiza_cobranca(valor, ciclista)
     return resultado_cobranca
 
 @app.route('/processaCobrancasEmFila', methods=['POST'])
-def processar_cobranca_em_fila():    
+def processar_cobrancas_em_fila():    
     
-    resultado_processamento = processa_cobrancas_atrasadas()
+    resultado_processamento = processa_cobrancas_pendentes()
     return resultado_processamento
 
 @app.route('/filaCobranca', methods=['POST'])
 def inserir_cobranca_em_fila():
     valor = float(request.form.get('valor'))
-    ciclista = (request.form.get('ciclista'))
+    ciclista = int(request.form.get('ciclista'))
     
     resultado_insercao = insere_cobranca_na_fila(valor, ciclista)
     return resultado_insercao
