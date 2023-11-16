@@ -1,19 +1,15 @@
-from unittest.mock import Mock
-import re #,os, logging
+from dotenv import load_dotenv
+import os
 
-requests = Mock()
+
 
 def envia_email(email, assunto, mensagem):
-    response_mock = Mock()
-    response_mock.status_code = "Email enviado", 200
+    load_dotenv()
    
-    response_mock.json.return_value = {
-        "msg": "Email enviado com sucesso!",
-        "email": email,
-        "assunto": assunto,
-        "mensagem": mensagem,
-    }
+    senha = os.getenv('EMAIL_PASSWORD')
+    remetente = os.getenv('EMAIL_SENDER')
 
+    ''' # mensagens de erro pertencem ao front
     regex = r'\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,7}\b' # expressão para validar o formato do email
 
     if not (re.fullmatch(regex, email)): # confere se está dentro do formato
@@ -25,6 +21,8 @@ def envia_email(email, assunto, mensagem):
         }
 
         return response_mock.json()
+
+    '''
     
-    return response_mock.json()
+    return 1
     
