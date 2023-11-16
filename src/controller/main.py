@@ -7,13 +7,18 @@ from flask_wtf.csrf import generate_csrf # LIB PARA CORREÇÃO DO CSRF NO SONAR 
 project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
 sys.path.insert(0, project_root)
 
-from service.EmailService import envia_email
+from service.EmailService import Email
+#from service.CobrancaService import Cobranca
 from service.CobrancaService import realiza_cobranca, insere_cobranca_na_fila, processa_cobrancas_pendentes, obtem_cobranca, valida_cartao
 
 app = Flask(__name__)
 requests = Mock()
 
 
+#cobranca = Cobranca()
+
+
+'''
 # config do SONAR do problema de CSRF
 csrf = CSRFProtect(app)
 csrf.init_app(app)
@@ -26,18 +31,25 @@ def get_csrf_token():
     token = generate_csrf()
     return token, 200
 #####################################
-
+'''
 
 @app.route('/', methods=['GET'])
 def hello_world():
     return "Hello World! :)"
+
+@app.route('/testeEmail', methods=['POST'])
+def enviar_email_teste_route():
+    data = request.json
+    email = data.get('email')
+
+    return Email.teste(email)
 
 @app.route('/enviarEmail', methods=['POST'])
 def enviar_email_route():
     data = request.json
     email, assunto, mensagem = data.get('email'), data.get('assunto'), data.get('mensagem')
 
-    return envia_email(email, assunto, mensagem)
+    return Email.envia_email(email, assunto, mensagem) #não retorna nada, na vdd
 
 @app.route('/cobranca', methods=['POST'])
 def realizar_cobranca_route():
