@@ -8,14 +8,15 @@ project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
 sys.path.insert(0, project_root)
 
 from service.EmailService import Email
-#from service.CobrancaService import Cobranca
-from service.CobrancaService import realiza_cobranca, insere_cobranca_na_fila, processa_cobrancas_pendentes, obtem_cobranca, valida_cartao
+from service.CobrancaService import Cobranca
+from service.CobrancaService import Validacao
 
 app = Flask(__name__)
 requests = Mock()
 
 
-#cobranca = Cobranca()
+cobranca = Cobranca()
+validacao = Validacao()
 email = Email()
 
 #config do SONAR do problema de CSRF
@@ -47,13 +48,13 @@ def realizar_cobranca_route():
     data = request.json
     valor, ciclista = float(data.get('valor')), int(data.get('ciclista'))
     
-    return realiza_cobranca(valor, ciclista)
+    return cobranca.realiza_cobranca(valor, ciclista)
 
 
 @app.route('/processaCobrancasEmFila', methods=['POST'])
 def processar_cobrancas_em_fila_route():    
     
-    return processa_cobrancas_pendentes()
+    return cobranca.processa_cobrancas_pendentes()
 
 
 @app.route('/filaCobranca', methods=['POST'])
@@ -61,13 +62,13 @@ def inserir_cobranca_em_fila_route():
     data = request.json
     valor, ciclista = float(data.get('valor')), int(data.get('ciclista'))
     
-    return insere_cobranca_na_fila(valor, ciclista)
+    return cobranca.insere_cobranca_na_fila(valor, ciclista)
 
 
 @app.route('/cobranca/<int:id_cobranca>', methods=['GET'])
 def obter_cobranca_route(id_cobranca):
 
-    return obtem_cobranca(id_cobranca)
+    return cobranca.obtem_cobranca(id_cobranca)
 
 
 @app.route('/validaCartaoDeCredito', methods=['POST'])
@@ -75,7 +76,7 @@ def validar_cartao_route():
     data = request.json
     nome_titular, numero, validade, cvv = data.get('nome_titular'), data.get('numero'), data.get('validade'), data.get('cvv')
     
-    return valida_cartao(nome_titular, numero, validade, cvv)
+    return validacao.valida_cartao(nome_titular, numero, validade, cvv)
 
 
 if __name__ == '__main__':
