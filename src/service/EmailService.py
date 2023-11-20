@@ -1,38 +1,48 @@
+from email.mime.multipart import MIMEMultipart
+from email.mime.text import MIMEText
 from dotenv import load_dotenv
-import os, requests
+from flask import jsonify
+import os
+import smtplib
 
+# Implementacao concreta do envio de email
 class Email:
+    load_dotenv()
 
-    def teste(email):
-        load_dotenv()
-    
-        API_KEY = os.getenv('API_KEY')
+    def __init__(self):
+        self.host = os.getenv('MAIL_SERVER') 
+        self.port = 587
+        self.username = os.getenv('MAIL_USERNAME')
+        self.password = os.getenv('MAIL_PASSWORD')
 
-        return requests.post(
-            "https://api.mailgun.net/v3/YOUR_DOMAIN_NAME/messages",
-            auth=("api", API_KEY),
-            data={"from": "Excited User <mailgun@sandbox4ae25e8eead44616a86246087ced0de3.mailgun.org>",
-                "to": [email, "grupoC@sandbox4ae25e8eead44616a86246087ced0de3.mailgun.org"],
-                "subject": "Hello",
-                "text": "Testing some Mailgun awesomeness!"})
+    def envia_email(self, destinatario, assunto, mensagem):
+        # Cria uma conexão com o servidor SMTP
+        servidor = smtplib.SMTP(self.host, self.port)
 
-    def envia_email(email, assunto, mensagem):
-        remetente = os.getenv('EMAIL_SENDER')
+        # Autentica-se no servidor
+        servidor.starttls()
+        servidor.login(self.username, self.password)
 
-        ''' # mensagens de erro pertencem ao front
-        regex = r'\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,7}\b' # expressão para validar o formato do email
+        # Cria a mensagem de e-mail
+        mensagem_sistema = MIMEMultipart()
+        mensagem_sistema['From'] = 'trizqueiroz@gmail.com'
+        mensagem_sistema['To'] = destinatario
+        mensagem_sistema['Subject'] = assunto
 
-        if not (re.fullmatch(regex, email)): # confere se está dentro do formato
-            response_mock = Mock()
-            response_mock.status_code = 422
-            response_mock.json.return_value = {
-                "codigo": 422,
-                "mensagem": "Email com formato inválido."
-            }
+        body = MIMEText(mensagem, 'plain')
+        mensagem_sistema.attach(body)
 
-            return response_mock.json()
+        # Envia a mensagem de e-mail
+        servidor.send_message(mensagem_sistema)
 
-        '''
-        
-        return 1
-        
+        # Fecha a conexão com o servidor
+        servidor.quit()
+
+        response = True
+
+        if response:
+            return jsonify({"status": "success", "message": "Email sent successfully"})
+        else:
+            return jsonify({"status": "error", "message": f"Failed to send email: {response.text}"}), response.status_code
+
+

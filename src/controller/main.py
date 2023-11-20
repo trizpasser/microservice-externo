@@ -16,40 +16,31 @@ requests = Mock()
 
 
 #cobranca = Cobranca()
+email = Email()
 
-
-'''
-# config do SONAR do problema de CSRF
-csrf = CSRFProtect(app)
-csrf.init_app(app)
-app.config['SECRET_KEY'] = 'teste123'
+#config do SONAR do problema de CSRF
+#csrf = CSRFProtect(app)
+#csrf.init_app(app)
+#app.config['SECRET_KEY'] = 'teste123'
 #####################################
 
 # config do SONAR do problema de CSRF
-@app.route('/get_csrf_token', methods=['GET'])
-def get_csrf_token():
-    token = generate_csrf()
-    return token, 200
+#@app.route('/get_csrf_token', methods=['GET'])
+#def get_csrf_token():
+#    token = generate_csrf()
+#    return token, 200
 #####################################
-'''
 
 @app.route('/', methods=['GET'])
 def hello_world():
     return "Hello World! :)"
 
-@app.route('/testeEmail', methods=['POST'])
-def enviar_email_teste_route():
-    data = request.json
-    email = data.get('email')
-
-    return Email.teste(email)
-
-@app.route('/enviarEmail', methods=['POST'])
+@app.route('/enviarEmail', methods=['POST']) 
 def enviar_email_route():
     data = request.json
-    email, assunto, mensagem = data.get('email'), data.get('assunto'), data.get('mensagem')
+    destinatario, assunto, mensagem = data.get('destinatario'), data.get('assunto'), data.get('mensagem')
 
-    return Email.envia_email(email, assunto, mensagem) #não retorna nada, na vdd
+    return email.envia_email(destinatario, assunto, mensagem)
 
 @app.route('/cobranca', methods=['POST'])
 def realizar_cobranca_route():
