@@ -25,9 +25,12 @@ jobs:
 
       - name: Run tests and coverage
         run: |
-#      coverage run src/tests/main_test.py
-  #      coverage xml -o coverage.xml
-
+         coverage run src/tests/main_test.py
+         coverage run src/tests/email_test.py
+         coverage run src/tests/cobranca_test.py
+         coverage xml -o coverage.xml
+        continue-on-error: true
+        
       - name: SonarCloud Scan
         uses: SonarSource/sonarcloud-github-action@master
         env:
