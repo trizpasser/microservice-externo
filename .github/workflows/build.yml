@@ -21,7 +21,7 @@ jobs:
 
       - name: Install dependencies
         run: |
-          pip install Flask gunicorn requests mock flask_wtf coverage
+          pip install Flask gunicorn requests mock flask_wtf coverage python-dotenv
 
       - name: Run tests and coverage
         run: |
@@ -30,7 +30,7 @@ jobs:
          coverage run src/tests/cobranca_test.py
          coverage xml -o coverage.xml
         continue-on-error: true
-        
+
       - name: SonarCloud Scan
         uses: SonarSource/sonarcloud-github-action@master
         env:
