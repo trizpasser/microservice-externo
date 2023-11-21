@@ -8,5 +8,5 @@ class Email:
         self.assunto = assunto
         self.mensagem = mensagem
 
-    def __init__(self) -> None:
+    def __init__(self) -> None: # Noncompliant - method is empty
         pass
