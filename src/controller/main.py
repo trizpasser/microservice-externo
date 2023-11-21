@@ -8,7 +8,7 @@ sys.path.insert(0, project_root)
 
 from model.email import Email
 from model.cobranca import Cobranca
-from service.EmailService import Email
+from service.EmailService import EmailService
 from service.CobrancaService import Cobranca
 
 app = Flask(__name__)

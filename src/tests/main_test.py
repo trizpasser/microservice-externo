@@ -4,7 +4,7 @@ from flask import Flask
 import os, sys
 project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
 sys.path.insert(0, project_root)
-from controller.main import app, email, cobranca  # Substitua "seu_modulo" pelo nome real do seu módulo
+from controller.main import app, email, cobranca  
 
 class TestController(unittest.TestCase):
 

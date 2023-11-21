@@ -14,7 +14,7 @@ class TestCobrancaService(unittest.TestCase):
 
    
     def test_lista_cobrancas(self):
-        resultado = self.objeto_classe.lista_cobrancas()
+        resultado = self.cobranca.lista_cobrancas()
         self.assertIsInstance(resultado, list)
         self.assertGreater(len(resultado), 0)
         self.assertIsInstance(resultado[0], dict)
@@ -28,7 +28,7 @@ class TestCobrancaService(unittest.TestCase):
     def test_realiza_cobranca(self):
         valor = 50
         ciclista = "Joao"
-        resultado, status_code = self.objeto_classe.realiza_cobranca(valor, ciclista)
+        resultado, status_code = self.cobranca.realiza_cobranca(valor, ciclista)
 
         self.assertEqual(status_code, 200)
         self.assertIsInstance(resultado, dict)
@@ -41,14 +41,14 @@ class TestCobrancaService(unittest.TestCase):
 
     def test_processa_cobrancas_pendentes(self):
     
-        resultado, status_code = self.objeto_classe.processa_cobrancas_pendentes()
+        resultado, status_code = self.cobranca.processa_cobrancas_pendentes()
         self.assertEqual(status_code, 200)
         self.assertEqual(resultado, "Todas as cobrancas foram quitadas!")
 
     def test_insere_cobranca_na_fila(self):
         valor = 30
         ciclista = "Maria"
-        resultado, status_code = self.objeto_classe.insere_cobranca_na_fila(valor, ciclista)
+        resultado, status_code = self.cobranca.insere_cobranca_na_fila(valor, ciclista)
 
         self.assertEqual(status_code, 200)
         self.assertIsInstance(resultado, list)
@@ -63,7 +63,7 @@ class TestCobrancaService(unittest.TestCase):
 
     def test_obtem_cobranca_existente(self):
         id_cobranca_existente = 1
-        resultado, status_code = self.objeto_classe.obtem_cobranca(id_cobranca_existente)
+        resultado, status_code = self.cobranca.obtem_cobranca(id_cobranca_existente)
 
         self.assertEqual(status_code, 200)
         self.assertIsInstance(resultado, dict)
@@ -76,7 +76,7 @@ class TestCobrancaService(unittest.TestCase):
 
     def test_obtem_cobranca_inexistente(self):
         id_cobranca_inexistente = 999
-        resultado, status_code = self.objeto_classe.obtem_cobranca(id_cobranca_inexistente)
+        resultado, status_code = self.cobranca.obtem_cobranca(id_cobranca_inexistente)
 
         self.assertEqual(status_code, 400)
         self.assertEqual(resultado, "Dados não encontrados")
@@ -87,7 +87,7 @@ class TestCobrancaService(unittest.TestCase):
         validade = "12/25"
         cvv = "123"
 
-        resultado, status_code = self.objeto_classe.valida_cartao(nome_titular, numero, validade, cvv)
+        resultado, status_code = self.cobranca.valida_cartao(nome_titular, numero, validade, cvv)
 
         self.assertEqual(status_code, 200)
         self.assertEqual(resultado, "Cartão válido!")
@@ -99,7 +99,7 @@ class TestCobrancaService(unittest.TestCase):
         validade = "01/21"
         cvv = ""
 
-        resultado, status_code = self.objeto_classe.valida_cartao(nome_titular, numero, validade, cvv)
+        resultado, status_code = self.cobranca.valida_cartao(nome_titular, numero, validade, cvv)
 
         self.assertEqual(status_code, 400)
         self.assertEqual(resultado, "Cartão inválido")
