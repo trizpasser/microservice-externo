@@ -39,15 +39,17 @@ def hello_world():
 def enviar_email_route():
     data = request.json
     destinatario, assunto, mensagem = data.get('destinatario'), data.get('assunto'), data.get('mensagem')
-
-    return email.envia_email(destinatario, assunto, mensagem)
+    
+    response = email.envia_email(destinatario, assunto, mensagem)
+    return response.json()
 
 @app.route('/cobranca', methods=['POST'])
 def realizar_cobranca_route():
     data = request.json
     valor, ciclista = float(data.get('valor')), int(data.get('ciclista'))
     
-    return cobranca.realiza_cobranca(valor, ciclista)
+    response = cobranca.realiza_cobranca(valor, ciclista)
+    return response.json()
 
 
 @app.route('/processaCobrancasEmFila', methods=['POST'])
@@ -66,8 +68,8 @@ def inserir_cobranca_em_fila_route():
 
 @app.route('/cobranca/<int:id_cobranca>', methods=['GET'])
 def obter_cobranca_route(id_cobranca):
-
-    return cobranca.obtem_cobranca(id_cobranca)
+    response = cobranca.obtem_cobranca(id_cobranca)
+    return response.json()
 
 
 @app.route('/validaCartaoDeCredito', methods=['POST'])

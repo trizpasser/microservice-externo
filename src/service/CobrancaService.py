@@ -40,7 +40,7 @@ class Cobranca:
                 "mensagem": "Dados inválidos"
             }
         ]
-            return erro, 422
+            return erro
 
         # supostamente rola um processo de cobrança aqui
 
@@ -58,7 +58,7 @@ class Cobranca:
             "ciclista": ciclista
         }
 
-        return info_cobranca, 200
+        return info_cobranca
         
 
         
@@ -85,7 +85,7 @@ class Cobranca:
                 "mensagem": "Dados inválidos"
             }
         ]
-            return erro, 422
+            return erro
 
         fila = Fila()
 
@@ -104,23 +104,23 @@ class Cobranca:
 
         fila.insere_cobranca(info_cobranca)
 
-        return fila.obtem_fila(), 200
+        return fila.obtem_fila()
 
 
     def obtem_cobranca(self, id_cobranca):
         cobrancas = self.lista_cobrancas()
         for cobranca in cobrancas:
             if cobranca['id'] == id_cobranca:
-                return cobranca, 200
+                return cobranca
             else:
-                return "Dados não encontrados", 400
+                return "Dados não encontrados"
 
     def valida_cartao(self, nome_titular, numero, validade, cvv):
         
         if nome_titular and numero and validade and cvv: # retorno simulado do processo de conferencia do cartao 
-            return "Cartão válido!", 200
+            return "Cartão válido!"
         else: 
-            return "Cartão inválido", 400
+            return "Cartão inválido"
 
 class Fila:
 
