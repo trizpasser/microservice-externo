@@ -16,7 +16,7 @@ requests = Mock()
 
 
 cobranca = Cobranca()
-email = Email()
+email = EmailService()
 
 #config do SONAR do problema de CSRF
 #csrf = CSRFProtect(app)
