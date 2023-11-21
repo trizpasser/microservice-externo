@@ -4,6 +4,10 @@ from dotenv import load_dotenv
 from flask import jsonify
 import os
 import smtplib
+import os, sys
+
+project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
+sys.path.insert(0, project_root)
 
 # Implementacao concreta do envio de email
 class Email:
