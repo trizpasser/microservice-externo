@@ -41,8 +41,6 @@ class Email:
 
         # Fecha a conexão com o servidor
         servidor.quit()
-
-        response = True
         
         return jsonify({"status": "success", "mensagem": "Email enviado com sucesso!"})
 
