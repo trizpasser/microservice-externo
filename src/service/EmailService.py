@@ -41,8 +41,8 @@ class Email:
         response = True
 
         if response:
-            return jsonify({"status": "success", "message": "Email sent successfully"})
+            return jsonify({"status": "success", "mensagem": "Email enviado com sucesso!"})
         else:
-            return jsonify({"status": "error", "message": f"Failed to send email: {response.text}"}), response.status_code
+            return jsonify({"status": "error", "mensagem": f"Erro ao enviar email: {response.text}"}), response.status_code
 
 

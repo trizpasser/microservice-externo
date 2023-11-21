@@ -1,14 +1,11 @@
 from queue import Queue
-from unittest.mock import Mock
 from datetime import datetime, timedelta
 import random
 
-requests = Mock()
 class Cobranca: 
+
     def lista_cobrancas(self):
-        response_mock = Mock()
-        response_mock.status_code = 200
-        response_mock.json.return_value = [
+        lista = [
                 {
                     "id": 1,
                     "ciclista": "123",
@@ -28,30 +25,27 @@ class Cobranca:
             ]
         
 
-        return response_mock.json()
+        return lista
 
     def realiza_cobranca(self, valor, ciclista):
-        response_mock = Mock()
-        response_mock.status_code = "Cobrança realizada", 200
 
         if valor <= 0 or valor is None or ciclista is None:
-            response_mock.status_code = 422
-            response_mock.json.return_value = [
+            erro = [
             {
                 "codigo": 422,
                 "mensagem": "Dados inválidos"
             }
         ]
-            return response_mock.json()
+            return erro, 422
 
         # supostamente rola um processo de cobrança aqui
 
         cobranca_id = random.randint(1,1000) # gera um id aleatorio
-        status = "Pago" # estatico, considerar mudar
+        status = "Pago" 
         hora_solicitacao = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         hora_finalizacao = (datetime.now() + timedelta(minutes=5)).strftime("%Y-%m-%d %H:%M:%S") # adiciona 5min como simulação
 
-        response_mock.json.return_value = {
+        info_cobranca = {
             "id": cobranca_id,
             "status": status,
             "horaSolicitacao": hora_solicitacao,
@@ -60,13 +54,11 @@ class Cobranca:
             "ciclista": ciclista
         }
 
-        return response_mock.json()
+        return info_cobranca, 200
         
 
         
     def processa_cobrancas_pendentes(self):
-        response_mock = Mock()
-        response_mock.status_code = "Cobranças pendentes processadas", 200
         
         fila = Fila()
 
@@ -77,31 +69,30 @@ class Cobranca:
             ciclista = cobranca_pendente["ciclista"]
 
             self.realiza_cobranca(valor, ciclista)
-
-        response_mock.json.return_value = "Todas as cobrancas foram quitadas!"
             
-        return response_mock.json()
+        return "Todas as cobrancas foram quitadas!", 200
         
         
     def insere_cobranca_na_fila(self, valor, ciclista):
-        response_mock = Mock()
-        response_mock.status_code = "Cobrança inserida na fila", 200
-
         if valor <= 0 or valor is None or ciclista is None:
-            response_mock.status_code = 422
-            response_mock.json.return_value = [
+            erro = [
             {
                 "codigo": 422,
                 "mensagem": "Dados inválidos"
             }
         ]
-            return response_mock.json()
-            
+            return erro, 422
+
+        #contador = 0
+        fila = Fila()
+
+        #while(contador < 5):
+
         cobranca_id = random.randint(1,1000) # gera id aleatorio
         status = "Pendente"
         hora_solicitacao = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
-        response_mock.json.return_value = {
+        info_cobranca = {
             "id": cobranca_id,
             "status": status,
             "horaSolicitacao": hora_solicitacao,
@@ -110,50 +101,26 @@ class Cobranca:
             "ciclista": ciclista
         }
 
-        fila = Fila()
-        fila.insere_cobranca(response_mock.json())
+        fila.insere_cobranca(info_cobranca)
+            #contador = contador + 1
 
-        return response_mock.json()
+        return fila.obtem_fila(), 200
 
 
     def obtem_cobranca(self, id_cobranca):
         cobrancas = self.lista_cobrancas()
-
         for cobranca in cobrancas:
             if cobranca['id'] == id_cobranca:
-                return cobranca
-    
-        response_mock = Mock()
-        response_mock.status_code = 404
-        response_mock.json.return_value = [
-            {
-                "codigo": 404,
-                "mensagem": "Não encontrado."
-            }
-        ]
+                return cobranca, 200
+            else:
+                return "Dados não encontrados", 400
 
-        return response_mock.json()
-
-class Validacao:
     def valida_cartao(self, nome_titular, numero, validade, cvv):
-        response_mock = Mock()
-        response_mock.status_code = "Cartão validado", 200
-        response_mock.json.return_value = "Dados atualizados!"
         
         if nome_titular and numero and validade and cvv: # retorno simulado do processo de conferencia do cartao 
-            return response_mock.json()
-
-        
-        response_mock.status_code = 422
-        response_mock.json.return_value = [
-            {
-                "codigo": 422,
-                "mensagem": "Dados inválido."
-            }
-        ]
-
-        return response_mock.json()
-
+            return "Cartão válido!", 200
+        else: 
+            return "Cartão inválido", 400
 
 class Fila:
 

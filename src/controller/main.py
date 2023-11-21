@@ -9,14 +9,12 @@ sys.path.insert(0, project_root)
 
 from service.EmailService import Email
 from service.CobrancaService import Cobranca
-from service.CobrancaService import Validacao
 
 app = Flask(__name__)
 requests = Mock()
 
 
 cobranca = Cobranca()
-validacao = Validacao()
 email = Email()
 
 #config do SONAR do problema de CSRF
@@ -76,7 +74,7 @@ def validar_cartao_route():
     data = request.json
     nome_titular, numero, validade, cvv = data.get('nome_titular'), data.get('numero'), data.get('validade'), data.get('cvv')
     
-    return validacao.valida_cartao(nome_titular, numero, validade, cvv)
+    return cobranca.valida_cartao(nome_titular, numero, validade, cvv)
 
 
 if __name__ == '__main__':
