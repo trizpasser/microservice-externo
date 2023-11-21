@@ -7,6 +7,8 @@ from flask_wtf.csrf import generate_csrf # LIB PARA CORREÇÃO DO CSRF NO SONAR 
 project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
 sys.path.insert(0, project_root)
 
+from model.email import Email
+from model.cobranca import Cobranca
 from service.EmailService import Email
 from service.CobrancaService import Cobranca
 
