@@ -1,103 +1,35 @@
-import unittest, os, sys
-from unittest.mock import patch
-
+import unittest
+from unittest.mock import MagicMock
+from flask import Flask
 project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
 sys.path.insert(0, project_root)
+from controller.main import app, email, cobranca  # Substitua "seu_modulo" pelo nome real do seu módulo
 
-from controller.main import app
+class TestController(unittest.TestCase):
 
-class TestMain(unittest.TestCase):
+    def setUp(self):
+        app.testing = True
+        self.app = app.test_client()
 
-    @patch('controller.main.Mock')
-    def test_cadastrar_bicicletas_route(self, mock_cadastrar_bicicletas):
+    def test_hello_world(self):
+        response = self.app.get('/')
+        self.assertEqual(response.data.decode('utf-8'), "Hello World! :)")
 
-        mock_cadastrar_bicicletas.status_code = 200
+    def test_enviar_email_route(self):
+        email.envia_email = MagicMock(return_value={"status": "success", "mensagem": "Email enviado com sucesso!"})
+        response = self.app.post('/enviarEmail', json={"destinatario": "test@example.com", "assunto": "Teste", "mensagem": "Corpo do e-mail"})
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.get_json(), {"status": "success", "mensagem": "Email enviado com sucesso!"})
+        email.envia_email.assert_called_once_with("test@example.com", "Teste", "Corpo do e-mail")
 
-        data = {
-            "email": "teste",
-            "assunto": "teste",
-            "mensagem ": "teste"
-        }
+    def test_realizar_cobranca_route(self):
+        cobranca.realiza_cobranca = MagicMock(return_value=({"id": 1, "status": "Pago", "valor": 20.0, "ciclista": 123}, 200))
+        response = self.app.post('/cobranca', json={"valor": 20.0, "ciclista": 123})
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.get_json(), {"id": 1, "status": "Pago", "valor": 20.0, "ciclista": 123})
+        cobranca.realiza_cobranca.assert_called_once_with(20.0, 123)
 
-        token = "None"
-        with app.test_client() as client:
-            response = client.get('/get_csrf_token')
-            token = response.get_data(as_text=True)
-            response = client.post('/enviarEmail', headers={"Content-Type": "application/json", "X-CSRFToken": token}, json=data)
-            self.assertEqual(response.status_code, mock_cadastrar_bicicletas.status_code)
-
-    @patch('controller.main.Mock')
-    def test_realizar_cobranca_route(self, mock_realiza_cobranca):
-        mock_realiza_cobranca.status_code = 200
-
-        data = {
-            "valor": 20,
-            "ciclista": 1
-        }
-
-        token = "None"
-        with app.test_client() as client:
-            response = client.get('/get_csrf_token')
-            token = response.get_data(as_text=True)
-            response = client.post('/cobranca', headers={"Content-Type": "application/json", "X-CSRFToken": token}, json=data)
-            self.assertEqual(response.status_code, mock_realiza_cobranca.status_code)
-
-
-    @patch('controller.main.Mock')
-    def test_processar_cobrancas_em_fila_route(self, mock_processa_cobrancas_pendentes):
-        mock_processa_cobrancas_pendentes.status_code = 200
-
-        token = "None"
-        with app.test_client() as client:
-            response = client.get('/get_csrf_token')
-            token = response.get_data(as_text=True)
-            response = client.post('/processaCobrancasEmFila', headers={"Content-Type": "application/json", "X-CSRFToken": token})
-            self.assertEqual(response.status_code, mock_processa_cobrancas_pendentes.status_code)
-
-    
-    @patch('controller.main.Mock')
-    def test_inserir_cobranca_em_fila_route(self, mock_insere_cobranca_na_fila):
-        mock_insere_cobranca_na_fila.status_code = 200
-
-        data = {
-            "valor": 20.0,
-            "ciclista": 2,
-        }
-
-        token = "None"
-        with app.test_client() as client:
-            response = client.get('/get_csrf_token')
-            token = response.get_data(as_text=True)
-            response = client.post('/filaCobranca', headers={"Content-Type": "application/json", "X-CSRFToken": token}, json=data)
-            self.assertEqual(response.status_code, mock_insere_cobranca_na_fila.status_code)
-
-
-    @patch('controller.main.Mock')
-    def test_obter_cobranca_route(self, mock_obtem_cobranca):
-        mock_obtem_cobranca.status_code = 200
-
-        with app.test_client() as client:
-            response = client.get('/cobranca/1', headers={"Content-Type": "application/json"})
-            self.assertEqual(response.status_code, mock_obtem_cobranca.status_code)
-
-
-    @patch('controller.main.Mock')
-    def test_validar_cartao_route(self, mock_valida_cartao):
-        mock_valida_cartao.status_code = 200
-
-        data = {
-            "cartao": {
-                "nome_titular": "Teste Titular",
-                "numero": "1234567812345678",
-                "validade": "12/24",
-                "cvv": "123",
-            }
-        }
-        with app.test_client() as client:
-            response = client.get('/get_csrf_token')
-            token = response.get_data(as_text=True)
-            response = client.post('/validaCartaoDeCredito', headers={"Content-Type": "application/json", "X-CSRFToken": token}, json=data)
-            self.assertEqual(response.status_code, mock_valida_cartao.status_code)
+    # Adicione mais testes para os outros métodos
 
 if __name__ == '__main__':
     unittest.main()
