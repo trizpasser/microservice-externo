@@ -39,10 +39,7 @@ class Email:
         servidor.quit()
 
         response = True
-
-        if response:
-            return jsonify({"status": "success", "mensagem": "Email enviado com sucesso!"})
-        else:
-            return jsonify({"status": "error", "mensagem": f"Erro ao enviar email: {response.text}"}), response.status_code
+        
+        return jsonify({"status": "success", "mensagem": "Email enviado com sucesso!"})
 
 

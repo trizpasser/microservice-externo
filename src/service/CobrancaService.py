@@ -83,10 +83,7 @@ class Cobranca:
         ]
             return erro, 422
 
-        #contador = 0
         fila = Fila()
-
-        #while(contador < 5):
 
         cobranca_id = random.randint(1,1000) # gera id aleatorio
         status = "Pendente"
@@ -102,7 +99,6 @@ class Cobranca:
         }
 
         fila.insere_cobranca(info_cobranca)
-            #contador = contador + 1
 
         return fila.obtem_fila(), 200
 
