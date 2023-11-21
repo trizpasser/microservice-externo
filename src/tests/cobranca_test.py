@@ -5,15 +5,15 @@ from datetime import datetime, timedelta
 project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
 sys.path.insert(0, project_root)
 
-from service.CobrancaService import realiza_cobranca, processa_cobrancas_pendentes, insere_cobranca_na_fila, obtem_cobranca, valida_cartao
+from controller.main import cobranca
+from controller.main import email
 
 class TestCobrancaService(unittest.TestCase):
 
-    @patch('service.CobrancaService.Mock')
-    def test_realiza_cobranca(self, mock_request):
+    @patch('controller.main.cobranca.realiza_cobranca')
+    def test_realizar_cobranca_route(self, mock_request):
         valor, ciclista = 20.0, "123"
         response_mock = Mock()
-        response_mock.status_code = 200
 
         response_mock.json.return_value = {
             "id": 1,
@@ -25,18 +25,16 @@ class TestCobrancaService(unittest.TestCase):
         }
 
         mock_request.return_value = response_mock
-        result = realiza_cobranca(valor, ciclista)
+        result = cobranca.realiza_cobranca(valor, ciclista)
         
-        self.assertEqual(result['status'], "Pago")
-        self.assertEqual(result['valor'], valor)
-        self.assertEqual(result['ciclista'], ciclista)
+        self.assertEqual(result.json['status'], "Pago")
+        self.assertEqual(result.json['valor'], valor)
+        self.assertEqual(result.json['ciclista'], ciclista)
 
    
-    @patch('service.CobrancaService.Mock')
-    @patch('service.CobrancaService.Fila')
-    def test_processa_cobrancas_pendentes(self, mock_fila, mock_request):
+    @patch('controller.main.cobranca.processa_cobrancas_pendentes')
+    def test_processa_cobrancas_pendentes(self, mock_fila):
         response_mock = Mock()
-        response_mock.status_code = 200
         response_mock.json.return_value = "Todas as cobrancas foram quitadas!"
 
         # Configurando mock_fila para retornar False quando confere_se_vazia for chamado
@@ -50,10 +48,10 @@ class TestCobrancaService(unittest.TestCase):
             "ciclista": "123"
         }
 
-        result = processa_cobrancas_pendentes()
-        self.assertEqual(result, "Todas as cobrancas foram quitadas!")
+        result = cobranca.processa_cobrancas_pendentes()
+        self.assertEqual(result, "Todas as cobrancas foram quitadas!", 200)
 
-    @patch('service.CobrancaService.Mock')
+    @patch('controller.main.cobranca.insere_cobranca_na_fila')
     def test_insere_cobranca_na_fila(self, mock_request):
         valor, ciclista = 20.0, "123"
         response_mock = Mock()
@@ -69,17 +67,16 @@ class TestCobrancaService(unittest.TestCase):
         }
 
         mock_request.return_value = response_mock
-        result = insere_cobranca_na_fila(valor, ciclista)
+        result = cobranca.insere_cobranca_na_fila(valor, ciclista)
 
         self.assertEqual(result['status'], "Pendente")
         self.assertEqual(result['valor'], valor)
         self.assertEqual(result['ciclista'], ciclista)
 
-    @patch('service.CobrancaService.Mock')
+    @patch('controller.main.cobranca.obtem_cobranca')
     def test_obtem_cobranca(self, mock_request):
         id_cobranca = 1
         response_mock = Mock()
-        response_mock.status_code = 200
 
         response_mock.json.return_value = {
             "id": id_cobranca,
@@ -91,24 +88,24 @@ class TestCobrancaService(unittest.TestCase):
         }
 
         mock_request.return_value = response_mock
-        result = obtem_cobranca(id_cobranca)
+        result = cobranca.obtem_cobranca(id_cobranca)
 
         self.assertEqual(result['id'], id_cobranca)
         self.assertEqual(result['status'], "Pago")
         self.assertEqual(result['valor'], 20.0)
         self.assertEqual(result['ciclista'], "123")
 
-    @patch('service.CobrancaService.Mock')
+    @patch('controller.main.cobranca.valida_cartao')
     def test_valida_cartao(self, mock_request):
         nome_titular, numero, validade, cvv = "João da Silva", "1234567890123456", "12/24", "123"
         response_mock = Mock()
         response_mock.status_code = 200
-        response_mock.json.return_value = "Dados atualizados!"
+        response_mock.json.return_value = "Cartão válido!"
 
         mock_request.return_value = response_mock
-        result = valida_cartao(nome_titular, numero, validade, cvv)
+        result = cobranca.valida_cartao(nome_titular, numero, validade, cvv)
 
-        self.assertEqual(result, "Dados atualizados!")
+        self.assertEqual(result, "Cartão válido!")
 
 if __name__ == '__main__':
     unittest.main()
