@@ -1,8 +1,8 @@
 from queue import Queue
 from datetime import datetime, timedelta
+from flask import jsonify
 from enum import Enum
-import random
-import os, sys
+import os, sys, random, requests
 
 project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
 sys.path.insert(0, project_root)
@@ -54,7 +54,23 @@ class CobrancaService:
         ]
             return erro, 422
 
-        #requisita dados do cartão pro ms-aluguel
+        #url_dados_cartao = "https://microservice-aluguel-hm535ksnoq-uc.a.run.app/CartaoDeCredito/" + cobranca.ciclista
+        #url_dados_cartao = "https://microservice-aluguel-hm535ksnoq-uc.a.run.app/funcionarios/" + cobranca.ciclista
+
+
+       #try:
+        #    response = requests.get(url_dados_cartao)
+
+            # Verifica se a requisição foi bem-sucedida (status code 2xx)
+        #    if response.ok:
+                # A resposta do microsserviço de destino está em response.text ou response.json()
+         #       resultado = response.json()
+          #      return response
+          #  else:
+           #     return jsonify({"status": "error", "mensagem": f"Falha na requisição: {str(e)}"})
+
+        #except Exception as e:
+         #   return jsonify ({"status": "error", "mensagem": f"Erro na requisição: {str(e)}"})
 
         #realiza a cobranca
 
