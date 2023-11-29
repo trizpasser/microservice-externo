@@ -21,29 +21,40 @@ class EmailService:
         self.username = os.getenv('MAIL_USERNAME')
         self.password = os.getenv('MAIL_PASSWORD')
 
-    def envia_email(self, destinatario, assunto, mensagem):
-        # Cria uma conexão com o servidor SMTP
-        servidor = smtplib.SMTP(self.host, self.port)
+    def envia_email(self, dados_email):
+        email = Email(
+            destinatario = dados_email['destinatario'], 
+            assunto = dados_email['assunto'], 
+            mensagem = dados_email['mensagem'])
 
-        # Autentica-se no servidor
-        servidor.starttls()
-        servidor.login(self.username, self.password)
+        try: 
 
-        # Cria a mensagem de e-mail
-        mensagem_sistema = MIMEMultipart()
-        mensagem_sistema['From'] = 'trizqueiroz@gmail.com'
-        mensagem_sistema['To'] = destinatario
-        mensagem_sistema['Subject'] = assunto
+            # Cria uma conexão com o servidor SMTP
+            servidor = smtplib.SMTP(self.host, self.port)
 
-        body = MIMEText(mensagem, 'plain')
-        mensagem_sistema.attach(body)
+            # Autentica-se no servidor
+            servidor.starttls()
+            servidor.login(self.username, self.password)
 
-        # Envia a mensagem de e-mail
-        servidor.send_message(mensagem_sistema)
+            # Cria a mensagem de e-mail
+            mensagem_sistema = MIMEMultipart()
+            mensagem_sistema['From'] = 'vaidebike44@gmail.com'
+            mensagem_sistema['To'] = email.destinatario
+            mensagem_sistema['Subject'] = email.assunto
 
-        # Fecha a conexão com o servidor
-        servidor.quit()
+            body = MIMEText(email.mensagem, 'plain')
+            mensagem_sistema.attach(body)
+
+            # Envia a mensagem de e-mail
+            servidor.send_message(mensagem_sistema)
+
+            # Fecha a conexão com o servidor
+            servidor.quit()
+            
+            return jsonify({"status": "success", "mensagem": "Email enviado com sucesso!"})
         
-        return jsonify({"status": "success", "mensagem": "Email enviado com sucesso!"})
+        except Exception as e:
+            return jsonify({"status": "error", "mensagem": f"Erro ao enviar o email: {str(e)}"})
+
 
 

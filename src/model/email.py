@@ -3,6 +3,3 @@ class Email:
         self.destinatario = destinatario
         self.assunto = assunto
         self.mensagem = mensagem
-
-    def __init__(self) -> None: # Noncompliant - method is empty
-        pass

@@ -12,7 +12,7 @@ from model.cartao_credito import CartoDeCredito
 
 class CobrancaService: 
 
-    def lista_cobrancas(self): #remover amtes dos testes
+    def lista_cobrancas(self): #remover antes dos testes
         lista = [
                 {
                     "id": 1,
@@ -137,9 +137,14 @@ class CobrancaService:
             else:
                 return "Dados não encontrados", 400
 
-    def valida_cartao(self, nome_titular, numero, validade, cvv):
-        
-        if nome_titular and numero and validade and cvv: # retorno simulado do processo de conferencia do cartao 
+    def valida_cartao(self, dados_cartao):
+        cartao = CartoDeCredito(
+            nome_titular = dados_cartao['nome_titular'], 
+            numero = dados_cartao['numero'], 
+            validade = dados_cartao['validade'], 
+            cvv = dados_cartao['cvv'])
+
+        if cartao.nome_titular and cartao.numero and cartao.validade and cartao.cvv: # retorno simulado do processo de conferencia do cartao 
             return "Cartão válido!", 200
         else: 
             return "Cartão inválido", 400

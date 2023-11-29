@@ -13,7 +13,7 @@ class TestCobrancaService(unittest.TestCase):
         self.cobranca = Cobranca()
 
    
-    def test_lista_cobrancas(self):
+    def test_lista_cobrancas(self): # remover 
         resultado = self.cobranca.lista_cobrancas()
         self.assertIsInstance(resultado, list)
         self.assertGreater(len(resultado), 0)

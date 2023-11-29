@@ -37,10 +37,9 @@ def hello_world():
 
 @app.route('/enviarEmail', methods=['POST']) 
 def enviar_email_route():
-    data = request.json
-    destinatario, assunto, mensagem = data.get('destinatario'), data.get('assunto'), data.get('mensagem')
+    dados_email = request.json
 
-    return email.envia_email(destinatario, assunto, mensagem)
+    return email.envia_email(dados_email)
 
 @app.route('/cobranca', methods=['POST'])
 def realizar_cobranca_route():
@@ -70,10 +69,9 @@ def obter_cobranca_route(id_cobranca):
 
 @app.route('/validaCartaoDeCredito', methods=['POST'])
 def validar_cartao_route():
-    data = request.json
-    nome_titular, numero, validade, cvv = data.get('nome_titular'), data.get('numero'), data.get('validade'), data.get('cvv')
+    dados_cartao = request.json
     
-    return cobranca.valida_cartao(nome_titular, numero, validade, cvv)
+    return cobranca.valida_cartao(dados_cartao)
 
 
 if __name__ == '__main__':
