@@ -54,6 +54,8 @@ class CobrancaService:
         ]
             return erro, 422
 
+        #requisita dados do cartão pro ms-aluguel
+
         #realiza a cobranca
 
         # se a cobrança for realizada: 
@@ -71,40 +73,30 @@ class CobrancaService:
             "ciclista": cobranca.ciclista
         }
 
+        # insere a cobrança no repository
+
         return info_cobranca, 200
     
         #se não for realizada:
-        #status = Status.FALHA
-        #chama fila
-        
-    # def 
-        
-    def processa_cobrancas_pendentes(self):
-
-        if fila.vazia():
-            return "Nenhuma cobrança na fila."
-       
-        else:
-           # print("Há " + fila.__sizeof__ + "cobranças na fila")
-            while fila.vazia() == False:
-                cobranca_pendente = fila.obtem_cobranca()
-            
-                valor = cobranca_pendente["valor"]
-                ciclista = cobranca_pendente["ciclista"]
-
-                self.realiza_cobranca(valor, ciclista)
-                
-            return "Todas as cobrancas foram quitadas!", 200
+        #cobranca.status = Status.FALHA
+        #info_cobranca = {
+        #    "status": cobranca.status.value,
+        #    "horaSolicitacao": cobranca.hora_solicitacao,
+        #    "valor": cobranca.valor,
+        #    "ciclista": cobranca.ciclista
+        #}
+        #insere_cobranca_na_fila(cobranca.valor, cobranca.ciclista)
+        # return info_cobranca, 500
         
         
     def insere_cobranca_na_fila(self, dados_cobranca):
         cobranca = Cobranca(
             valor = dados_cobranca['valor'], 
             ciclista = dados_cobranca['ciclista'], 
-            id = random.randint(1,1000), 
+            id = None, 
             status = Status.PENDENTE, 
             hora_finalizacao = None, 
-            hora_solicitacao = datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
+            hora_solicitacao = None)
 
         if cobranca.valor <= 0 or cobranca.valor is None or cobranca.ciclista is None:
             erro = [
@@ -116,10 +108,10 @@ class CobrancaService:
             return erro, 422
 
         info_cobranca = {
-            "id": cobranca.id,
+        #    "id": cobranca.id,
             "status": cobranca.status.value,
-            "horaSolicitacao": cobranca.hora_solicitacao,
-            "horaFinalizacao": "-", 
+        #    "horaSolicitacao": cobranca.hora_solicitacao,
+        #    "horaFinalizacao": "-", 
             "valor": cobranca.valor,
             "ciclista": cobranca.ciclista
         }
@@ -129,13 +121,31 @@ class CobrancaService:
         return fila.obtem_fila(), 200
 
 
+    def processa_cobrancas_pendentes(self):
+
+        if fila.vazia():
+            return "Nenhuma cobrança na fila."
+       
+        else:
+            while fila.vazia() == False:
+                cobranca_pendente = fila.obtem_cobranca()
+            
+                valor = cobranca_pendente["valor"]
+                ciclista = cobranca_pendente["ciclista"]
+
+                self.realiza_cobranca(valor, ciclista)
+                
+            return "Todas as cobrancas foram quitadas!", 200
+
+
     def obtem_cobranca(self, id_cobranca):
         cobrancas = self.lista_cobrancas()
-        for cobranca in cobrancas:
+        for cobranca in cobrancas: # cobranças no repository
             if cobranca['id'] == id_cobranca:
                 return cobranca, 200
             else:
                 return "Dados não encontrados", 400
+            
 
     def valida_cartao(self, dados_cartao):
         cartao = CartoDeCredito(

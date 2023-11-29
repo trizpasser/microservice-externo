@@ -28,7 +28,6 @@ class EmailService:
             mensagem = dados_email['mensagem'])
 
         try: 
-
             # Cria uma conexão com o servidor SMTP
             servidor = smtplib.SMTP(self.host, self.port)
 
@@ -55,6 +54,3 @@ class EmailService:
         
         except Exception as e:
             return jsonify({"status": "error", "mensagem": f"Erro ao enviar o email: {str(e)}"})
-
-
-

@@ -6,9 +6,6 @@ import os, sys
 project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
 sys.path.insert(0, project_root)
 
-from model.email import Email
-from model.cobranca import Cobranca
-from model.cartao_credito import CartoDeCredito
 from service.EmailService import EmailService
 from service.CobrancaService import CobrancaService
 
@@ -31,15 +28,17 @@ email = EmailService()
 #    return token, 200
 #####################################
 
-@app.route('/', methods=['GET'])
+@app.route('/', methods=['GET']) # teste 
 def hello_world():
     return "Hello World! :)"
+
 
 @app.route('/enviarEmail', methods=['POST']) 
 def enviar_email_route():
     dados_email = request.json
 
     return email.envia_email(dados_email)
+
 
 @app.route('/cobranca', methods=['POST'])
 def realizar_cobranca_route():
