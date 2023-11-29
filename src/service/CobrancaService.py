@@ -1,14 +1,18 @@
 from queue import Queue
 from datetime import datetime, timedelta
+from enum import Enum
 import random
 import os, sys
 
 project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
 sys.path.insert(0, project_root)
 
-class Cobranca: 
+from model.cobranca import Cobranca
+from model.cartao_credito import CartoDeCredito
 
-    def lista_cobrancas(self):
+class CobrancaService: 
+
+    def lista_cobrancas(self): #remover amtes dos testes
         lista = [
                 {
                     "id": 1,
@@ -31,9 +35,17 @@ class Cobranca:
 
         return lista
 
-    def realiza_cobranca(self, valor, ciclista):
+    def realiza_cobranca(self, dados_cobranca):
 
-        if valor <= 0 or valor is None or ciclista is None:
+        cobranca = Cobranca(
+            valor = dados_cobranca['valor'], 
+            ciclista = dados_cobranca['ciclista'], 
+            id = None, 
+            status = Status.OCUPADA, 
+            hora_finalizacao = None, 
+            hora_solicitacao = datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
+
+        if cobranca.valor <= 0 or cobranca.valor is None or cobranca.ciclista is None:
             erro = [
             {
                 "codigo": 422,
@@ -42,43 +54,59 @@ class Cobranca:
         ]
             return erro, 422
 
-        # supostamente rola um processo de cobrança aqui
+        #realiza a cobranca
 
-        cobranca_id = random.randint(1,1000) # gera um id aleatorio
-        status = "Pago" 
-        hora_solicitacao = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-        hora_finalizacao = (datetime.now() + timedelta(minutes=5)).strftime("%Y-%m-%d %H:%M:%S") # adiciona 5min como simulação
+        # se a cobrança for realizada: 
+
+        cobranca.id = random.randint(1,1000) # gera um id aleatorio
+        cobranca.status = Status.PAGA
+        cobranca.hora_finalizacao = (datetime.now() + timedelta(minutes=5)).strftime("%Y-%m-%d %H:%M:%S") # adiciona 5min como simulação
 
         info_cobranca = {
-            "id": cobranca_id,
-            "status": status,
-            "horaSolicitacao": hora_solicitacao,
-            "horaFinalizacao": hora_finalizacao,
-            "valor": valor,
-            "ciclista": ciclista
+            "id": cobranca.id,
+            "status": cobranca.status.value,
+            "horaSolicitacao": cobranca.hora_solicitacao,
+            "horaFinalizacao": cobranca.hora_finalizacao,
+            "valor": cobranca.valor,
+            "ciclista": cobranca.ciclista
         }
 
         return info_cobranca, 200
+    
+        #se não for realizada:
+        #status = Status.FALHA
+        #chama fila
         
-
+    # def 
         
     def processa_cobrancas_pendentes(self):
-        
-        fila = Fila()
 
-        while fila.confere_se_vazia() != None:
-            cobranca_pendente = fila.obtem_cobranca()
-        
-            valor = cobranca_pendente["valor"]
-            ciclista = cobranca_pendente["ciclista"]
-
-            self.realiza_cobranca(valor, ciclista)
+        if fila.vazia():
+            return "Nenhuma cobrança na fila."
+       
+        else:
+           # print("Há " + fila.__sizeof__ + "cobranças na fila")
+            while fila.vazia() == False:
+                cobranca_pendente = fila.obtem_cobranca()
             
-        return "Todas as cobrancas foram quitadas!", 200
+                valor = cobranca_pendente["valor"]
+                ciclista = cobranca_pendente["ciclista"]
+
+                self.realiza_cobranca(valor, ciclista)
+                
+            return "Todas as cobrancas foram quitadas!", 200
         
         
-    def insere_cobranca_na_fila(self, valor, ciclista):
-        if valor <= 0 or valor is None or ciclista is None:
+    def insere_cobranca_na_fila(self, dados_cobranca):
+        cobranca = Cobranca(
+            valor = dados_cobranca['valor'], 
+            ciclista = dados_cobranca['ciclista'], 
+            id = random.randint(1,1000), 
+            status = Status.PENDENTE, 
+            hora_finalizacao = None, 
+            hora_solicitacao = datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
+
+        if cobranca.valor <= 0 or cobranca.valor is None or cobranca.ciclista is None:
             erro = [
             {
                 "codigo": 422,
@@ -87,19 +115,13 @@ class Cobranca:
         ]
             return erro, 422
 
-        fila = Fila()
-
-        cobranca_id = random.randint(1,1000) # gera id aleatorio
-        status = "Pendente"
-        hora_solicitacao = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-
         info_cobranca = {
-            "id": cobranca_id,
-            "status": status,
-            "horaSolicitacao": hora_solicitacao,
+            "id": cobranca.id,
+            "status": cobranca.status.value,
+            "horaSolicitacao": cobranca.hora_solicitacao,
             "horaFinalizacao": "-", 
-            "valor": valor,
-            "ciclista": ciclista
+            "valor": cobranca.valor,
+            "ciclista": cobranca.ciclista
         }
 
         fila.insere_cobranca(info_cobranca)
@@ -133,10 +155,20 @@ class Fila:
     def insere_cobranca(self, cobranca):
         self.fila_cobrancas_pendentes.put(cobranca)
 
-    def confere_se_vazia(self):
-        if self.fila_cobrancas_pendentes.empty():
-            return None
+    def vazia(self):
+        return self.fila_cobrancas_pendentes.empty()
 
     def obtem_cobranca(self):
         return self.fila_cobrancas_pendentes.get()
+    
+fila = Fila()
+
+class Status(Enum):
+    PENDENTE = "Pendente"
+    PAGA = "Paga"
+    FALHA = "Falha"
+    CANCELADA = "Cancelada"
+    OCUPADA = "Ocupada"
+
+
 

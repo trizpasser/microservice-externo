@@ -1,9 +1,5 @@
-import os, sys
-project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
-sys.path.insert(0, project_root)
-
 class Cobranca:
-    def __init__(self, id, ciclista, status, hora_solicitacao, hora_finalizacao, valor):
+    def __init__(self, id : int, ciclista : str, status : str, hora_solicitacao: str, hora_finalizacao : str, valor : float):
         self.id = id
         self.ciclista = ciclista
         self.status = status

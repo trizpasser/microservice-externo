@@ -1,21 +1,21 @@
 from flask import Flask, request
 from unittest.mock import Mock
-from flask_wtf import CSRFProtect # LIB PARA CORREÇÃO DO CSRF NO SONAR -> DOC PARA TODOS OS MICROSERVICES
-from flask_wtf.csrf import generate_csrf # LIB PARA CORREÇÃO DO CSRF NO SONAR -> DOC PARA TODOS OS MICROSERVICES
+#from flask_wtf import CSRFProtect # LIB PARA CORREÇÃO DO CSRF NO SONAR -> DOC PARA TODOS OS MICROSERVICES
+#from flask_wtf.csrf import generate_csrf # LIB PARA CORREÇÃO DO CSRF NO SONAR -> DOC PARA TODOS OS MICROSERVICES
 import os, sys
 project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
 sys.path.insert(0, project_root)
 
 from model.email import Email
 from model.cobranca import Cobranca
+from model.cartao_credito import CartoDeCredito
 from service.EmailService import EmailService
-from service.CobrancaService import Cobranca
+from service.CobrancaService import CobrancaService
 
 app = Flask(__name__)
 requests = Mock()
 
-
-cobranca = Cobranca()
+cobranca = CobrancaService()
 email = EmailService()
 
 #config do SONAR do problema de CSRF
@@ -44,10 +44,9 @@ def enviar_email_route():
 
 @app.route('/cobranca', methods=['POST'])
 def realizar_cobranca_route():
-    data = request.json
-    valor, ciclista = float(data.get('valor')), int(data.get('ciclista'))
+    dados_cobranca = request.json
     
-    return cobranca.realiza_cobranca(valor, ciclista)
+    return cobranca.realiza_cobranca(dados_cobranca)
 
 
 @app.route('/processaCobrancasEmFila', methods=['POST'])
@@ -58,10 +57,9 @@ def processar_cobrancas_em_fila_route():
 
 @app.route('/filaCobranca', methods=['POST'])
 def inserir_cobranca_em_fila_route():
-    data = request.json
-    valor, ciclista = float(data.get('valor')), int(data.get('ciclista'))
+    dados_cobranca = request.json
     
-    return cobranca.insere_cobranca_na_fila(valor, ciclista)
+    return cobranca.insere_cobranca_na_fila(dados_cobranca)
 
 
 @app.route('/cobranca/<int:id_cobranca>', methods=['GET'])
