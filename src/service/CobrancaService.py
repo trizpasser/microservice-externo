@@ -2,7 +2,8 @@ from queue import Queue
 from datetime import datetime, timedelta
 from flask import jsonify
 from enum import Enum
-import os, sys, random, requests
+from dotenv import load_dotenv
+import os, sys, random, stripe, requests
 
 project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
 sys.path.insert(0, project_root)
@@ -11,6 +12,12 @@ from model.cobranca import Cobranca
 from model.cartao_credito import CartoDeCredito
 
 class CobrancaService: 
+    load_dotenv()
+
+    def __init__(self):
+        #self.public_key = "pk_test_51OHrHLFrYaHOdlTY1ZVqHGiHLIyGQjiKLlF1BMKOd9VFU99rKxO5JXU2bExGCMk8UDNZsteFsJBlXr5aLT110Bl100beNiidIT"
+        self.api_key = os.getenv('STRIPE_PRIVATE_KEY')
+
 
     def lista_cobrancas(self): #remover antes dos testes
         lista = [
@@ -54,9 +61,52 @@ class CobrancaService:
         ]
             return erro, 422
 
-        #url_dados_cartao = "https://microservice-aluguel-hm535ksnoq-uc.a.run.app/CartaoDeCredito/" + cobranca.ciclista
-        #url_dados_cartao = "https://microservice-aluguel-hm535ksnoq-uc.a.run.app/funcionarios/" + cobranca.ciclista
+        cartao = self.obtem_dados_cartao(cobranca.ciclista)
 
+        try: 
+            stripe.PaymentIntent.create(
+                amount = cobranca.valor,
+                currency = 'brl',
+                payment_method="pm_card_visa",
+            )
+
+            cobranca.id = random.randint(1,1000) # gera um id aleatorio
+            cobranca.status = Status.PAGA
+            cobranca.hora_finalizacao = (datetime.now() + timedelta(minutes=5)).strftime("%Y-%m-%d %H:%M:%S")
+
+            info_cobranca = {
+                "-Status-": "Cobrança realizada com sucesso!",
+                "id": cobranca.id,
+                "status": cobranca.status.value,
+                "horaSolicitacao": cobranca.hora_solicitacao,
+                "horaFinalizacao": cobranca.hora_finalizacao,
+                "valor": cobranca.valor,
+                "ciclista": cobranca.ciclista
+            }
+            # insere a cobrança no repository
+
+            return info_cobranca, 200
+
+        except Exception as e:
+            self.insere_cobranca_na_fila(cobranca.valor, cobranca.ciclista)
+
+            return jsonify({"status": "error", "mensagem": f"Erro ao realizar cobrança: {str(e)}"})
+
+        #se não for realizada:
+        #cobranca.status = Status.FALHA
+        #info_cobranca = {
+        #    "status": cobranca.status.value,
+        #    "horaSolicitacao": cobranca.hora_solicitacao,
+        #    "valor": cobranca.valor,
+        #    "ciclista": cobranca.ciclista
+        #}
+        #insere_cobranca_na_fila(cobranca.valor, cobranca.ciclista)
+        # return info_cobranca, 500
+    
+    def obtem_dados_cartao(self, ciclista):
+
+
+        #url_dados_cartao = "https://microservice-aluguel-hm535ksnoq-uc.a.run.app/CartaoDeCredito/{ciclista}"
 
        #try:
         #    response = requests.get(url_dados_cartao)
@@ -71,40 +121,9 @@ class CobrancaService:
 
         #except Exception as e:
          #   return jsonify ({"status": "error", "mensagem": f"Erro na requisição: {str(e)}"})
-
-        #realiza a cobranca
-
-        # se a cobrança for realizada: 
-
-        cobranca.id = random.randint(1,1000) # gera um id aleatorio
-        cobranca.status = Status.PAGA
-        cobranca.hora_finalizacao = (datetime.now() + timedelta(minutes=5)).strftime("%Y-%m-%d %H:%M:%S") # adiciona 5min como simulação
-
-        info_cobranca = {
-            "id": cobranca.id,
-            "status": cobranca.status.value,
-            "horaSolicitacao": cobranca.hora_solicitacao,
-            "horaFinalizacao": cobranca.hora_finalizacao,
-            "valor": cobranca.valor,
-            "ciclista": cobranca.ciclista
-        }
-
-        # insere a cobrança no repository
-
-        return info_cobranca, 200
+        
+        return 0
     
-        #se não for realizada:
-        #cobranca.status = Status.FALHA
-        #info_cobranca = {
-        #    "status": cobranca.status.value,
-        #    "horaSolicitacao": cobranca.hora_solicitacao,
-        #    "valor": cobranca.valor,
-        #    "ciclista": cobranca.ciclista
-        #}
-        #insere_cobranca_na_fila(cobranca.valor, cobranca.ciclista)
-        # return info_cobranca, 500
-        
-        
     def insere_cobranca_na_fila(self, dados_cobranca):
         cobranca = Cobranca(
             valor = dados_cobranca['valor'], 

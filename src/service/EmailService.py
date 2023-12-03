@@ -14,7 +14,7 @@ class EmailService:
     load_dotenv()
 
     def __init__(self):
-        self.host = os.getenv('MAIL_SERVER') 
+        self.host = "smtp.mailgun.org" 
         self.port = 587
         self.username = os.getenv('MAIL_USERNAME')
         self.password = os.getenv('MAIL_PASSWORD')
