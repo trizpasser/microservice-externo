@@ -34,9 +34,9 @@ def hello_world():
 
 @app.route('/testeCobranca', methods=['POST']) # teste 
 def teste_email():
-    valor = request.json
+    dados = request.json
 
-    return cobranca.efetua_cobranca(valor)
+    return cobranca.efetua_cobranca(dados)
 
 @app.route('/enviarEmail', methods=['POST']) 
 def enviar_email_route():

@@ -16,7 +16,6 @@ class CobrancaService:
     load_dotenv()
 
     def __init__(self):
-        #self.public_key = "pk_test_51OHrHLFrYaHOdlTY1ZVqHGiHLIyGQjiKLlF1BMKOd9VFU99rKxO5JXU2bExGCMk8UDNZsteFsJBlXr5aLT110Bl100beNiidIT"
         self.api_key = os.getenv('STRIPE_PRIVATE_KEY')
 
         self.thread_agendamento = threading.Thread(target=self.run_schedule)
@@ -46,22 +45,22 @@ class CobrancaService:
 
         return lista
     
-    def efetua_cobranca(self, valor): #cartao??
+    def efetua_cobranca(self, valor): 
         stripe.api_key = self.api_key
-        self.valor = valor
-
+        valor = int(valor * 100) # o amount é em centavos, então converte reais em centavos
+    
         try:
             stripe.PaymentIntent.create(
-                amount = float(valor),
+                amount = valor,
                 currency = "brl",
                 payment_method = "pm_card_visa",
             )
 
-            return "Cobranca realiza!"
+            return True
         
         except Exception as e:
 
-            return jsonify({"status": "error", "mensagem": f"Erro ao realizar cobrança: {str(e)}"})
+            return False, jsonify({"status": "error", "mensagem": f"Erro ao realizar cobrança: {str(e)}"})
 
 
     def realiza_cobranca(self, dados_cobranca):
@@ -83,15 +82,10 @@ class CobrancaService:
         ]
             return erro, 422
 
-        cartao = self.obtem_dados_cartao(cobranca.ciclista)
+        #cartao = self.obtem_dados_cartao(cobranca.ciclista)
+        #add cartao = CartaoDeCredito()
 
-        try: 
-            stripe.PaymentIntent.create(
-                amount = cobranca.valor,
-                currency = 'brl',
-                payment_method="pm_card_visa",
-            )
-
+        if self.efetua_cobranca(cobranca.valor): 
             cobranca.id = random.randint(1,1000) # gera um id aleatorio
             cobranca.status = Status.PAGA
             cobranca.hora_finalizacao = (datetime.now() + timedelta(minutes=5)).strftime("%Y-%m-%d %H:%M:%S")
@@ -105,14 +99,13 @@ class CobrancaService:
                 "valor": cobranca.valor,
                 "ciclista": cobranca.ciclista
             }
-            # insere a cobrança no repository
 
             return info_cobranca, 200
-
-        except Exception as e:
+        
+        else:
             self.insere_cobranca_na_fila(cobranca.valor, cobranca.ciclista)
+            return "Falha na cobrança, tentaremos mais tarde."
 
-            return jsonify({"status": "error", "mensagem": f"Erro ao realizar cobrança: {str(e)}"})
 
         #se não for realizada:
         #cobranca.status = Status.FALHA
@@ -226,19 +219,21 @@ class CobrancaService:
     #    return requests.get("http://127.0.0.1:8080")
                
 
-    def teste_email_requisicao(self):
+    def requisita_enviar_email(self, assunto, mensagem):
         url_email = "https://microservice-externo-b4i7jmshsa-uc.a.run.app/enviarEmail"
+        
         dados = {"destinatario": "bqueiroz@edu.unirio.br", 
-                 "assunto": "Teste de Integração 1", 
-                 "mensagem": "teste teste teste"
+                 "assunto": assunto, 
+                 "mensagem": mensagem
                  }
         try:
             response = requests.post(url_email, json = dados)
             response.raise_for_status()
 
+        # confere se a requisição retorna um json
         except requests.exceptions.RequestException as e:
             return (f"Erro na requisição: {e}")
-        
+    
         if response.status_code == 200:
             return jsonify({"mensagem": "Requisição bem-sucedida"})
         else:
