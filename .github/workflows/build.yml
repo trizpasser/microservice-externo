@@ -22,6 +22,8 @@ jobs:
       - name: Install dependencies
         run: |
 # pip install Flask gunicorn requests mock flask_wtf coverage python-dotenv
+          sudo apt-get update
+          sudo apt-get install -y libssl-dev libffi-dev python3-dev
           pip install -r src/requirements.txt
 
       - name: Run tests and coverage
