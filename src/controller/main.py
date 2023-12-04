@@ -30,7 +30,7 @@ email = EmailService()
 
 @app.route('/', methods=['GET']) # teste 
 def hello_world():
-    return "Hello World! :)"
+    return "Hello World :)"
 
 
 @app.route('/enviarEmail', methods=['POST']) 
@@ -75,4 +75,4 @@ def validar_cartao_route():
 
 if __name__ == '__main__':
     app.run(port=int(os.environ.get("PORT", 8080)),host='0.0.0.0',debug=True)
-
+    #cobranca.agendamento()

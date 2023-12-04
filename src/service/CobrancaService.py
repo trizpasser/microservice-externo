@@ -3,7 +3,8 @@ from datetime import datetime, timedelta
 from flask import jsonify
 from enum import Enum
 from dotenv import load_dotenv
-import os, sys, random, stripe, requests
+from schedule import repeat, every
+import os, sys, random, stripe, schedule, time, threading, requests
 
 project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
 sys.path.insert(0, project_root)
@@ -17,7 +18,11 @@ class CobrancaService:
     def __init__(self):
         #self.public_key = "pk_test_51OHrHLFrYaHOdlTY1ZVqHGiHLIyGQjiKLlF1BMKOd9VFU99rKxO5JXU2bExGCMk8UDNZsteFsJBlXr5aLT110Bl100beNiidIT"
         self.api_key = os.getenv('STRIPE_PRIVATE_KEY')
+        self.contador = 0
 
+        self.thread_agendamento = threading.Thread(target=self.agendamento)
+        self.thread_agendamento.daemon = True  # Define a thread como um daemon para que ela seja encerrada quando o programa principal terminar
+        self.thread_agendamento.start()
 
     def lista_cobrancas(self): #remover antes dos testes
         lista = [
@@ -155,9 +160,8 @@ class CobrancaService:
 
         return fila.obtem_fila(), 200
 
-
+    @repeat(every(12).hours)
     def processa_cobrancas_pendentes(self):
-
         if fila.vazia():
             return "Nenhuma cobrança na fila."
        
@@ -193,6 +197,21 @@ class CobrancaService:
             return "Cartão válido!", 200
         else: 
             return "Cartão inválido", 400
+        
+
+    def agendamento(self):
+        while True:
+            schedule.run_pending()
+            time.sleep(1)
+    
+    @repeat(every(5).seconds)
+    def agendamento_teste():
+        return requests.get("http://127.0.0.1:8080")
+
+        #url_email = "https://microservice-externo-b4i7jmshsa-uc.a.run.app/enviarEmail"
+        #dados = {"destinatario": "bqueiroz@edu.unirio.br", "assunto": "Teste Envio", "mensagem": "lorem ipsum"}
+        
+        #return requests.post(url_email, json = dados)
 
 class Fila:
 
@@ -211,6 +230,7 @@ class Fila:
     def obtem_cobranca(self):
         return self.fila_cobrancas_pendentes.get()
     
+
 fila = Fila()
 
 class Status(Enum):
@@ -219,6 +239,5 @@ class Status(Enum):
     FALHA = "Falha"
     CANCELADA = "Cancelada"
     OCUPADA = "Ocupada"
-
 
 
