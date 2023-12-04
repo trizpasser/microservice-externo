@@ -18,9 +18,8 @@ class CobrancaService:
     def __init__(self):
         #self.public_key = "pk_test_51OHrHLFrYaHOdlTY1ZVqHGiHLIyGQjiKLlF1BMKOd9VFU99rKxO5JXU2bExGCMk8UDNZsteFsJBlXr5aLT110Bl100beNiidIT"
         self.api_key = os.getenv('STRIPE_PRIVATE_KEY')
-        self.contador = 0
 
-        self.thread_agendamento = threading.Thread(target=self.agendamento)
+        self.thread_agendamento = threading.Thread(target=self.run_schedule)
         self.thread_agendamento.daemon = True  # Define a thread como um daemon para que ela seja encerrada quando o programa principal terminar
         self.thread_agendamento.start()
 
@@ -46,6 +45,24 @@ class CobrancaService:
         
 
         return lista
+    
+    def efetua_cobranca(self, valor): #cartao??
+        stripe.api_key = self.api_key
+        self.valor = valor
+
+        try:
+            stripe.PaymentIntent.create(
+                amount = float(valor),
+                currency = "brl",
+                payment_method = "pm_card_visa",
+            )
+
+            return "Cobranca realiza!"
+        
+        except Exception as e:
+
+            return jsonify({"status": "error", "mensagem": f"Erro ao realizar cobrança: {str(e)}"})
+
 
     def realiza_cobranca(self, dados_cobranca):
 
@@ -199,14 +216,14 @@ class CobrancaService:
             return "Cartão inválido", 400
         
 
-    def agendamento(self):
+    def run_schedule(self):
         while True:
             schedule.run_pending()
             time.sleep(1)
     
-    @repeat(every(5).seconds)
-    def agendamento_teste():
-        return requests.get("http://127.0.0.1:8080")
+    #@repeat(every(5).seconds)
+    #def agendamento_teste():
+    #    return requests.get("http://127.0.0.1:8080")
                
 
     def teste_email_requisicao(self):
@@ -215,7 +232,6 @@ class CobrancaService:
                  "assunto": "Teste de Integração 1", 
                  "mensagem": "teste teste teste"
                  }
-
         try:
             response = requests.post(url_email, json = dados)
             response.raise_for_status()
@@ -223,11 +239,9 @@ class CobrancaService:
         except requests.exceptions.RequestException as e:
             return (f"Erro na requisição: {e}")
         
-        if response.status_code // 100 == 2:
-        # A requisição foi bem-sucedida
+        if response.status_code == 200:
             return jsonify({"mensagem": "Requisição bem-sucedida"})
         else:
-        # A requisição falhou
             return jsonify({"mensagem": "Erro na requisição", "status_code": response.status_code})
 
 

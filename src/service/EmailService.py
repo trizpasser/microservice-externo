@@ -16,8 +16,9 @@ class EmailService:
     def __init__(self):
         self.host = "smtp.mailgun.org" 
         self.port = 587
-        self.username = os.getenv('MAIL_USERNAME')
-        self.password = os.getenv('MAIL_PASSWORD')
+        self.MAIL_USERNAME = os.getenv('MAIL_USERNAME')
+        self.MAIL_PASSWORD = os.getenv('MAIL_PASSWORD')
+        
 
     def envia_email(self, dados_email):
         email = Email(
@@ -31,7 +32,7 @@ class EmailService:
 
             # Autentica-se no servidor
             servidor.starttls()
-            servidor.login(self.username, self.password)
+            servidor.login(self.MAIL_USERNAME, self.MAIL_PASSWORD)
 
             # Cria a mensagem de e-mail
             mensagem_sistema = MIMEMultipart()
