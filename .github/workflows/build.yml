@@ -21,7 +21,7 @@ jobs:
 
       - name: Install dependencies
         run: |
-          pip install Flask gunicorn requests mock flask_wtf coverage python-dotenv
+          pip install Flask gunicorn requests mock flask_wtf coverage python-dotenv stripe schedule
 
       - name: Run tests and coverage
         run: |
