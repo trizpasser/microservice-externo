@@ -206,14 +206,30 @@ class CobrancaService:
     
     @repeat(every(5).seconds)
     def agendamento_teste():
-        return requests.get("https://microservice-externo-b4i7jmshsa-uc.a.run.app/")
-        #url_email = "https://microservice-externo-b4i7jmshsa-uc.a.run.app/enviarEmail"
-        #dados = {"destinatario": "bqueiroz@edu.unirio.br", 
-        #         "assunto": "Teste de Integração 1", 
-        #         "mensagem": "teste teste teste"
-        #         }
+        return requests.get("http://127.0.0.1:8080")
+               
+
+    def teste_email_requisicao(self):
+        url_email = "https://microservice-externo-b4i7jmshsa-uc.a.run.app/enviarEmail"
+        dados = {"destinatario": "bqueiroz@edu.unirio.br", 
+                 "assunto": "Teste de Integração 1", 
+                 "mensagem": "teste teste teste"
+                 }
+
+        try:
+            response = requests.post(url_email, json = dados)
+            response.raise_for_status()
+
+        except requests.exceptions.RequestException as e:
+            return (f"Erro na requisição: {e}")
         
-        #return requests.post(url_email, json = dados)
+        if response.status_code // 100 == 2:
+        # A requisição foi bem-sucedida
+            return jsonify({"mensagem": "Requisição bem-sucedida"})
+        else:
+        # A requisição falhou
+            return jsonify({"mensagem": "Erro na requisição", "status_code": response.status_code})
+
 
 class Fila:
 

@@ -32,6 +32,9 @@ email = EmailService()
 def hello_world():
     return "Hello World :)"
 
+@app.route('/testeEmail', methods=['GET']) # teste 
+def teste_email():
+    return cobranca.teste_email_requisicao()
 
 @app.route('/enviarEmail', methods=['POST']) 
 def enviar_email_route():
