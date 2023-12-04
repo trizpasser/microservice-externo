@@ -204,16 +204,16 @@ class CobrancaService:
             schedule.run_pending()
             time.sleep(1)
     
-    @repeat(every(1).minute)
+    @repeat(every(5).seconds)
     def agendamento_teste():
-        #return requests.get("http://127.0.0.1:8080")
-        url_email = "https://microservice-externo-b4i7jmshsa-uc.a.run.app/enviarEmail"
-        dados = {"destinatario": "bqueiroz@edu.unirio.br", 
-                 "assunto": "Teste de Integração 1", 
-                 "mensagem": "teste teste teste"
-                }
+        return requests.get("http://127.0.0.1:8080")
+        #url_email = "https://microservice-externo-b4i7jmshsa-uc.a.run.app/enviarEmail"
+        #dados = {"destinatario": "bqueiroz@edu.unirio.br", 
+        #         "assunto": "Teste de Integração 1", 
+        #         "mensagem": "teste teste teste"
+        #         }
         
-        return requests.post(url_email, json = dados)
+        #return requests.post(url_email, json = dados)
 
 class Fila:
 
