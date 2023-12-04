@@ -206,7 +206,7 @@ class CobrancaService:
     
     @repeat(every(5).seconds)
     def agendamento_teste():
-        return requests.get("http://127.0.0.1:8080")
+        return requests.get("https://microservice-externo-b4i7jmshsa-uc.a.run.app/")
         #url_email = "https://microservice-externo-b4i7jmshsa-uc.a.run.app/enviarEmail"
         #dados = {"destinatario": "bqueiroz@edu.unirio.br", 
         #         "assunto": "Teste de Integração 1", 
