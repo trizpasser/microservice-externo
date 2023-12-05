@@ -73,7 +73,7 @@ class TestCobrancaService(unittest.TestCase):
     def test_valida_cartao_valido(self):
         nome_titular = "Joao Silva"
         numero = "1234567890123456"
-        validade = "12/25"
+        validade = "2024-12"
         cvv = "123"
 
         resultado, status_code = self.cobranca.valida_cartao(nome_titular, numero, validade, cvv)
@@ -85,7 +85,7 @@ class TestCobrancaService(unittest.TestCase):
        
         nome_titular = ""
         numero = "1234"
-        validade = "01/21"
+        validade = "2024-12"
         cvv = ""
 
         resultado, status_code = self.cobranca.valida_cartao(nome_titular, numero, validade, cvv)

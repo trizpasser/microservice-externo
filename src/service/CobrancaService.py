@@ -203,6 +203,7 @@ class CobrancaService:
                     'cvc': '123'
                 }
             )
+     
         except Exception as e:
             return jsonify ({"status": "error", "mensagem": f"Cartão inválido: {str(e)}"}), 500
         
