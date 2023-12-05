@@ -5,7 +5,7 @@ from enum import Enum
 from dotenv import load_dotenv
 from schedule import repeat, every
 import os, sys, random, stripe, schedule, time, threading, requests
-
+from google.cloud import secretmanager
 project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
 sys.path.insert(0, project_root)
 
@@ -66,8 +66,9 @@ class CobrancaService:
             return jsonify({"mensagem": "Erro na requisição", "status_code": response.status_code})
         
     
+
     def efetua_cobranca(self, valor): 
-        stripe.api_key = self.api_key
+        stripe.api_key = self.busca_secrets_keys('STRIPE_PRIVATE_KEY')
         valor = int(valor * 100) # o amount é em centavos, então converte reais em centavos
     
         try:
@@ -94,11 +95,6 @@ class CobrancaService:
             hora_finalizacao = None, 
             hora_solicitacao = datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
         
-
-
-
-        
-
         if cobranca.valor <= 0 or cobranca.valor is None or cobranca.ciclista is None:
             erro = [
             {
@@ -148,6 +144,12 @@ class CobrancaService:
         #}
         #insere_cobranca_na_fila(cobranca.valor, cobranca.ciclista)
         # return info_cobranca, 500
+
+    def busca_secrets_keys(self, name_key):
+        client = secretmanager.SecretManagerServiceClient()   
+        path = f"projects/microservice-externo/secrets/{name_key}/versions/latest"
+        response = client.access_secret_version(name=path)
+        return response.payload.data.decode("UTF-8")
     
     def obtem_dados_cartao(self, ciclista):
 

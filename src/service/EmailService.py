@@ -16,8 +16,6 @@ class EmailService:
     def __init__(self):
         self.host = "smtp.mailgun.org" 
         self.port = 587
-        self.username = os.getenv('MAIL_USERNAME')
-        self.password = os.getenv('MAIL_PASSWORD')
         
 
     def envia_email(self, dados_email):
@@ -33,13 +31,8 @@ class EmailService:
             # Cria uma conexão com o servidor SMTP
             servidor = smtplib.SMTP(self.host, self.port)
 
-            mail_username_path = f"projects/{project_id}/secrets/MAIL_USERNAME/versions/latest"
-            response_mail_username = client.access_secret_version(name=mail_username_path)
-            username = response_mail_username.payload.data.decode("UTF-8")
-
-            mail_password_path = f"projects/{project_id}/secrets/MAIL_PASSWORD/versions/latest"
-            response_password = client.access_secret_version(name=mail_password_path)
-            password = response_password.payload.data.decode("UTF-8")
+            username = self.busca_secrets_keys("MAIL_USERNAME")
+            password = self.busca_secrets_keys("MAIL_PASSWORD")
 
             # Autentica-se no servidor
             servidor.starttls()
@@ -64,3 +57,9 @@ class EmailService:
         
         except Exception as e:
             return jsonify({"status": "error", "mensagem": f"Erro ao enviar o email: {str(e)}"}, 500)
+        
+    def busca_secrets_keys(self, name_key):
+        client = secretmanager.SecretManagerServiceClient()   
+        path = f"projects/microservice-externo/secrets/{name_key}/versions/latest"
+        response = client.access_secret_version(name=path)
+        return response.payload.data.decode("UTF-8")
