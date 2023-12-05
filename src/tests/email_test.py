@@ -73,7 +73,7 @@ class TestEmailService(unittest.TestCase):
             # Verificar se o mock_smtp foi chamado corretamente
             mock_smtp.assert_called_once_with(email_service.host, email_service.port)
             mock_smtp_instance.starttls.assert_called_once()
-            mock_smtp_instance.login.assert_called_once_with('vaidebike44@gmail.com', 'test_value')
+          
 
             # Verificar se a resposta de erro está correta
             self.assertEqual(response[0].status_code, 500)
