@@ -19,7 +19,7 @@ class TestEmailService(unittest.TestCase):
         self.app_context.pop()
 
    
-   @patch('service.EmailService.smtplib.SMTP')
+    @patch('service.EmailService.smtplib.SMTP')
     def test_envia_email_success(self, mock_smtp):
         # Configurar o retorno desejado para a função busca_secrets_keys
         with patch('service.EmailService.EmailService.busca_secrets_keys', return_value='test_value'):
