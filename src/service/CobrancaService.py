@@ -30,7 +30,7 @@ class CobrancaService:
     
 
     def efetua_cobranca(self, valor, dados_cartao): 
-        if dados_cartao.ok:
+        if dados_cartao.get('ok'):
             print("Dados ok")
 
         stripe.api_key = self.busca_secrets_keys('STRIPE_PRIVATE_KEY')
