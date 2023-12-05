@@ -106,12 +106,6 @@ class CobrancaService:
 
         dados_cartao = self.obtem_dados_cartao(cobranca.ciclista)
 
-        cartao = CartaoDeCredito(
-            nome_titular = dados_cartao['nome_titular'],
-            numero = dados_cartao['numero'],
-            validade = dados_cartao['validade'],
-            cvv = dados_cartao['cvv'] )
-
         if self.efetua_cobranca(cobranca.valor): 
             cobranca.id = random.randint(1,1000) # gera um id aleatorio
             cobranca.status = Status.PAGA
@@ -230,16 +224,19 @@ class CobrancaService:
             
 
     def valida_cartao(self, dados_cartao):
-        cartao = CartaoDeCredito(
-            nome_titular = dados_cartao['nome_titular'], 
-            numero = dados_cartao['numero'], 
-            validade = dados_cartao['validade'], 
-            cvv = dados_cartao['cvv'])
+        stripe.api_key = self.busca_secrets_keys('STRIPE_PRIVATE_KEY')
 
-        if cartao.nome_titular and cartao.numero and cartao.validade and cartao.cvv: # retorno simulado do processo de conferencia do cartao 
-            return "Cartão válido!", 200
-        else: 
-            return "Cartão inválido", 400
+        try:
+            token = stripe.Token.create(
+                card={  # teste stripe
+                    'number': '4000056655665556',  
+                    'exp_month': '12',
+                    'exp_year': '2024',
+                    'cvc': '123'
+                }
+            )
+        except Exception as e:
+            return jsonify ({"status": "error", "mensagem": f"Cartão inválido: {str(e)}"})
         
 
     def run_schedule(self):
