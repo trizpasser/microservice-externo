@@ -26,7 +26,7 @@ class TestController(unittest.TestCase):
        response = self.client.post('/enviarEmail', headers={"Content-Type": "application/json"}, json=email_json )
 
        self.assertEqual(response.status_code, 200)
-       self.assertEqual(response.return_value, mock_enviar_email.return_value)
+       self.assertEqual(response, mock_enviar_email.return_value)
     
 
 
