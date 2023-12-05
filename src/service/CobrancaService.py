@@ -178,7 +178,7 @@ class CobrancaService:
             
 
     def valida_cartao(self, dados_cartao):
-        if dados_cartao.ok:
+        if dados_cartao.get('ok'):
             print("Dados ok")
 
         stripe.api_key = self.busca_secrets_keys('STRIPE_PRIVATE_KEY')
