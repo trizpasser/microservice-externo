@@ -36,7 +36,7 @@ class EmailService:
 
             mail_username_path = f"projects/{project_id}/secrets/MAIL_USERNAME/versions/latest"
             response_mail_username = client.acess_secret_version(name=mail_username_path)
-            username = response_MAIL_USERNAME.payload.data.decode("UTF-8")
+            username = response_mail_username.payload.data.decode("UTF-8")
 
             mail_password_path = f"projects/{project_id}/secrets/MAIL_PASSWORD/versions/latest"
             response_password = client.acess_secret_version(name=mail_password_path)
