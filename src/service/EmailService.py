@@ -24,36 +24,25 @@ class EmailService:
             destinatario = dados_email['destinatario'], 
             assunto = dados_email['assunto'], 
             mensagem = dados_email['mensagem'])
-        try: 
-            # Cria uma conexão com o servidor SMTP
-            servidor = smtplib.SMTP(self.host, self.port)
 
+        try: 
+            servidor = smtplib.SMTP(self.host, self.port)
             username = self.busca_secrets_keys("MAIL_USERNAME")
             password = self.busca_secrets_keys("MAIL_PASSWORD")
-
-            # Autentica-se no servidor
             servidor.starttls()
             servidor.login(username, password)
-
-            # Cria a mensagem de e-mail
             mensagem_sistema = MIMEMultipart()
             mensagem_sistema['From'] = 'vaidebike44@gmail.com'
             mensagem_sistema['To'] = email.destinatario
             mensagem_sistema['Subject'] = email.assunto
-
             body = MIMEText(email.mensagem, 'plain')
             mensagem_sistema.attach(body)
-
-            # Envia a mensagem de e-mail
             servidor.send_message(mensagem_sistema)
-
-            # Fecha a conexão com o servidor
             servidor.quit()
-            
             return jsonify({"status": "success", "mensagem": "Email enviado com sucesso!"})
         
         except Exception as e:
-            return jsonify({"status": "error", "mensagem": f"Erro ao enviar o email: {str(e)}"}, 500)
+            return jsonify({"status": "error", "mensagem": f"Erro ao enviar o email: {str(e)}"}), 500
         
     def busca_secrets_keys(self, name_key):
         client = secretmanager.SecretManagerServiceClient()   

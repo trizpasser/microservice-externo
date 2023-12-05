@@ -16,17 +16,9 @@ class CobrancaService:
     load_dotenv()
 
     def __init__(self):
-        self.api_key = os.getenv('STRIPE_PRIVATE_KEY')
-
         self.thread_agendamento = threading.Thread(target=self.run_schedule)
-        self.thread_agendamento.daemon = True  # Define a thread como um daemon para que ela seja encerrada quando o programa principal terminar
+        self.thread_agendamento.daemon = True  
         self.thread_agendamento.start()
-
-    def busca_secrets_keys(self, name_key):
-        client = secretmanager.SecretManagerServiceClient()   
-        path = f"projects/microservice-externo/secrets/{name_key}/versions/latest"
-        response = client.access_secret_version(name=path)
-        return response.payload.data.decode("UTF-8")
     
 
     def efetua_cobranca(self, valor, dados_cartao): 
@@ -42,7 +34,6 @@ class CobrancaService:
                 currency = "brl",
                 payment_method = "pm_card_visa",
             )
-
             return True
         
         except Exception as e:
@@ -57,17 +48,14 @@ class CobrancaService:
         try:
             response = requests.get(url_dados_cartao)
 
-            # Verifica se a requisição foi bem-sucedida (status code 2xx)
             if response.ok:
-                # A resposta do microsserviço de destino está em response.text ou response.json()
                 resultado = response.json()
                 return resultado
             else:
-                
                 return jsonify("Erro:", response.status_code)
 
         except Exception as e:
-            return jsonify ({"status": "error", "mensagem": f"Erro na requisição: {str(e)}"})
+            return jsonify ({"status": "error", "mensagem": f"Erro na requisição: {str(e)}"}), response.response_status_code
 
 
     def realiza_cobranca(self, dados_cobranca):
@@ -170,7 +158,7 @@ class CobrancaService:
 
     def obtem_cobranca(self, id_cobranca):
         cobrancas = self.lista_cobrancas()
-        for cobranca in cobrancas: # cobranças no repository
+        for cobranca in cobrancas: 
             if cobranca['id'] == id_cobranca:
                 return cobranca, 200
             else:
@@ -185,7 +173,7 @@ class CobrancaService:
 
         try:
             stripe.Token.create(
-                card={  # teste stripe
+                card={  
                     'number': '4000056655665556',  
                     'exp_month': '12',
                     'exp_year': '2024',
@@ -193,13 +181,19 @@ class CobrancaService:
                 }
             )
         except Exception as e:
-            return jsonify ({"status": "error", "mensagem": f"Cartão inválido: {str(e)}"}, 500)
+            return jsonify ({"status": "error", "mensagem": f"Cartão inválido: {str(e)}"}), 500
         
 
     def run_schedule(self):
         while True:
             schedule.run_pending()
             time.sleep(1)
+    
+    def busca_secrets_keys(self, name_key):
+        client = secretmanager.SecretManagerServiceClient()   
+        path = f"projects/microservice-externo/secrets/{name_key}/versions/latest"
+        response = client.access_secret_version(name=path)
+        return response.payload.data.decode("UTF-8")
 
 class Fila:
 

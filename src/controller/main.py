@@ -13,7 +13,7 @@ requests = Mock()
 cobranca = CobrancaService()
 email = EmailService()
 
-@app.route('/', methods=['GET']) # teste 
+@app.route('/', methods=['GET'])
 def hello_world():
     return "Hello World :)"
 
