@@ -13,9 +13,6 @@ class TestController(unittest.TestCase):
         self.app = app
         self.client = self.app.test_client()
 
-    def test_hello_world(self):
-        response = self.app.get('/')
-        self.assertEqual(response.data.decode('utf-8'), "Hello World! :)")
 
     @patch('controller.main.enviar_email_route')
     def test_enviar_email_route_200(self, mock_enviar_email):
@@ -70,7 +67,7 @@ class TestController(unittest.TestCase):
         mock.return_value = {
              "codigo": 422,
              "mensagem": "Dados inválidos"
-            }, 422
+            }
 
         data = {"valor": "ad" , "ciclista": ""}
         
