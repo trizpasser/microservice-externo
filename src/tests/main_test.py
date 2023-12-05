@@ -67,7 +67,7 @@ class TestController(unittest.TestCase):
     def teste_inserir_cobranca_em_fila_route_200(self, mock_inserir_cobranca_em_fila):
         mock_inserir_cobranca_em_fila.return_value = "Cobranca registrada como pendente", 200
         data = {"valor": 10, "ciclista": "123"}
-        response = self.client.get('/filaCobranca', headers={"Content-Type": "application/json"}, json=data)
+        response = self.client.post('/filaCobranca', headers={"Content-Type": "application/json"}, json=data)
 
         self.assertEqual(response.status_code, 200)
 
