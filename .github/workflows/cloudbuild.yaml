@@ -35,6 +35,7 @@ jobs:
         docker push gcr.io/microservice-externo/microservice-externo:$GITHUB_SHA
         
     - name: Save Secrets to GCP Secret Manager
+      continue-on-error: true
       env: 
        GCP_PROJECT_ID: microservice-externo
        GCP_SA_KEY: ${{ secrets.GCP_SA_KEY }}
