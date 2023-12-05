@@ -33,7 +33,16 @@ jobs:
       run: |
         docker buildx build --platform linux/amd64 -t gcr.io/microservice-externo/microservice-externo:$GITHUB_SHA src/
         docker push gcr.io/microservice-externo/microservice-externo:$GITHUB_SHA
-
+        
+    - name: Save Secrets to GCP Secret Manager
+      env: 
+       GCP_PROJECT_ID: microservice-externo
+       GCP_SA_KEY: ${{ secrets.GCP_SA_KEY }}
+      run: |
+        gcloud secrets create MAIL_USERNAME --data-file <(echo -n ${{secrets.MAIL_USERNAME}})
+        gcloud secrets create MAIL_PASSWORD --data-file <(echo -n ${{secrets.MAIL_PASSWORD}})
+        gcloud secrets create STRIPE_PRIVATE_KEY --data-file <(echo -n ${{ secrets.STRIPE_PRIVATE_KEY }})
+        
     - name: Deploy to Cloud Run
       run: |
         gcloud run deploy microservice-externo \
