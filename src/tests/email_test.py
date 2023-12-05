@@ -19,30 +19,66 @@ class TestEmailService(unittest.TestCase):
         self.app_context.pop()
 
    
+   @patch('service.EmailService.smtplib.SMTP')
+    def test_envia_email_success(self, mock_smtp):
+        # Configurar o retorno desejado para a função busca_secrets_keys
+        with patch('service.EmailService.EmailService.busca_secrets_keys', return_value='test_value'):
+            email_service = EmailService()
+
+            # Configurar o comportamento do mock_smtp
+            mock_smtp_instance = mock_smtp.return_value
+            mock_smtp_instance.login.return_value = None
+
+            # Dados de email de teste
+            dados_email = {
+                'destinatario': 'bqueiroz@edu.unirio.br',
+                'assunto': 'Teste',
+                'mensagem': 'Olá!'
+            }
+
+            # Chamar o método envia_email
+            response = email_service.envia_email(dados_email)
+
+            # Verificar se o mock_smtp foi chamado corretamente
+            mock_smtp.assert_called_once_with(email_service.host, email_service.port)
+            mock_smtp_instance.starttls.assert_called_once()
+            mock_smtp_instance.login.assert_called_once_with('vaidebike44@gmail.com', 'test_value')
+            mock_smtp_instance.send_message.assert_called_once()
+
+            # Verificar se a resposta está correta
+            self.assertEqual(response[0].status_code, 200)
+            self.assertEqual(response[1]['status'], 'success')
+
     @patch('service.EmailService.smtplib.SMTP')
-    def test_envia_email_sucesso(self, mock_smtp):
-        # Configuração do mock
-        mock_instance = mock_smtp.return_value
+    def test_envia_email_failure(self, mock_smtp):
+        # Configurar o retorno desejado para a função busca_secrets_keys
+        with patch('service.EmailService.EmailService.busca_secrets_keys', return_value='test_value'):
+            email_service = EmailService()
 
-        # Configuração do método de autenticação
-        mock_instance.starttls.return_value = True
-        mock_instance.login.return_value = True
+            # Configurar o comportamento do mock_smtp para simular uma exceção
+            mock_smtp_instance = mock_smtp.return_value
+            mock_smtp_instance.login.side_effect = Exception("Erro ao fazer login")
 
-        # Execução do teste
-        destinatario = 'destinatario@example.com'
-        assunto = 'Assunto do E-mail'
-        mensagem = 'Corpo do E-mail'
+            # Dados de email de teste
+            dados_email = {
+                'destinatario': 'bqueiroz@edu.unirio.br',
+                'assunto': 'Teste',
+                'mensagem': 'Olá!'
+            }
 
-        objeto_email = EmailService()
-        resultado = objeto_email.envia_email(destinatario, assunto, mensagem)
 
-        # Verificações
-        mock_instance.starttls.assert_called_once()
-        mock_instance.login.assert_called_once_with(objeto_email.username, objeto_email.password)
-        mock_instance.send_message.assert_called_once()
+            # Chamar o método envia_email
+            response = email_service.envia_email(dados_email)
 
-        self.assertEqual(resultado.status_code, 200)
-        self.assertEqual(resultado.json, {"status": "success", "mensagem": "Email enviado com sucesso!"})
+            # Verificar se o mock_smtp foi chamado corretamente
+            mock_smtp.assert_called_once_with(email_service.host, email_service.port)
+            mock_smtp_instance.starttls.assert_called_once()
+            mock_smtp_instance.login.assert_called_once_with('vaidebike44@gmail.com', 'test_value')
+
+            # Verificar se a resposta de erro está correta
+            self.assertEqual(response[0].status_code, 500)
+            self.assertEqual(response[1]['status'], 'error')
+
 
    
 
