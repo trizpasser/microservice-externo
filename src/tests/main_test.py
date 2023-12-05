@@ -62,15 +62,12 @@ class TestController(unittest.TestCase):
     
     @patch('controller.main.inserir_cobranca_em_fila_route')
     def test_realizar_cobranca_route_422(self, mock):
-        mock.return_value = {
-             "codigo": 422,
-             "mensagem": "Dados inválidos"
-            }
+       
 
         data = {"valor": "ad" , "ciclista": ""}
         
         response = self.client.post('/filaCobranca', headers={"Content-Type": "application/json"}, json=data)
-        self.assertEqual(response, mock.return_value)
+        self.assertEqual(response, 422)
 
 
 if __name__ == '__main__':
