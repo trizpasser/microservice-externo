@@ -9,28 +9,73 @@ from controller.main import app, email, cobranca
 class TestController(unittest.TestCase):
 
     def setUp(self):
-        app.testing = True
-        self.app = app.test_client()
+        self.app = app
+        self.client = self.app.test_client()
 
     def test_hello_world(self):
         response = self.app.get('/')
         self.assertEqual(response.data.decode('utf-8'), "Hello World! :)")
 
-    def test_enviar_email_route(self):
-        email.envia_email = MagicMock(return_value={"status": "success", "mensagem": "Email enviado com sucesso!"})
-        response = self.app.post('/enviarEmail', json={"destinatario": "test@example.com", "assunto": "Teste", "mensagem": "Corpo do e-mail"})
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.get_json(), {"status": "success", "mensagem": "Email enviado com sucesso!"})
-        email.envia_email.assert_called_once_with("test@example.com", "Teste", "Corpo do e-mail")
+    @patch('controller.main.enviar_email_route')
+    def test_enviar_email_route_200(self, mock_enviar_email):
+       email_json = {"destinatario": "bqueiroz@edu.unirio.br", "assunto": "teste unitario", "mensagem": "corpo do teste de email"}
+       mock_enviar_email.return_value = {
+        "mensagem": "Email enviado com sucesso!",
+        "status": "success"}
+       response = self.client.post('/enviarEmail', headers={"Content-Type": "application/json"}, json=email_json )
 
-    def test_realizar_cobranca_route(self):
-        cobranca.realiza_cobranca = MagicMock(return_value=({"id": 1, "status": "Pago", "valor": 20.0, "ciclista": 123}, 200))
-        response = self.app.post('/cobranca', json={"valor": 20.0, "ciclista": 123})
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.get_json(), {"id": 1, "status": "Pago", "valor": 20.0, "ciclista": 123})
-        cobranca.realiza_cobranca.assert_called_once_with(20.0, 123)
+       self.assertEqual(response.status_code, 200)
+       self.assertEqual(response.return_value, mock_enviar_email.return_value)
+    
 
-    # Adicione mais testes para os outros métodos
+
+
+    @patch('controller.main.enviar_email_route')
+    def test_enviar_email_route_500(self, mock_enviar_email):
+       email_json = {"destinatario": "", "assunto": "teste unitario", "mensagem": "corpo do teste de email"}
+      
+
+       response = self.client.post('/enviarEmail', headers={"Content-Type": "application/json"}, json=email_json )
+
+       self.assertEqual(response.status_code, 500)
+       
+
+    @patch('controller.main.cobranca.realizar_cobranca_route')
+    def test_realizar_cobranca_route_200(self, mock_realiza_cobranca):
+        mock_realiza_cobranca.return_value = {
+            "-Status-": "Cobrança realizada com sucesso!", 
+            "status:": "Paga"
+            "valor": 100
+            "ciclista": "100"
+            }
+
+        data = {"valor": 100, "ciclista": "100"}
+
+        response = self.client.post('/cobranca', headers={"Content-Type": "application/json"}, json=data)
+
+        self.assertEqual(response.status_code, 200)
+        
+
+    @patch('controller.main.cobranca.processar_cobrancas_em_fila_route')
+    def test_realizar_cobranca_route_200(self, mock):
+        mock.return_value = "Todas as cobrancas foram quitadas!", 200
+        data = {"valor": 100, "ciclista": "100"}
+        response = self.client.post('/processaCobrancaEmFila', headers={"Content-Type": "application/json"}, json=data)
+        self.assertEqual(response.status_code, 200)
+
+    
+    @patch('controller.main.cobranca.inserir_cobranca_em_fila_route')
+    def test_realizar_cobranca_route_422(self, mock):
+        mock.return_value = {
+             "codigo": 422,
+             "mensagem": "Dados inválidos"
+            }, 422
+
+        data = {"valor": "ad" , "ciclista": ""}
+        
+        response = self.client.post('/filaCobranca', headers={"Content-Type": "application/json"}, json=data)
+        self.assertEqual(response.return_value, mock.return_value)
+
 
 if __name__ == '__main__':
     unittest.main()
