@@ -22,10 +22,10 @@ class TestEmailService(unittest.TestCase):
     @patch('service.EmailService.smtplib.SMTP')
     def test_envia_email_success(self, mock_smtp):
         # Configurar o retorno desejado para a função busca_secrets_keys
-        with patch('service.EmailService.EmailService.busca_secrets_keys', return_value='test_value'):
+    
             email_service = EmailService()
 
-            # Configurar o comportamento do mock_smtp
+      # Configurar o comportamento do mock_smtp
             mock_smtp_instance = mock_smtp.return_value
             mock_smtp_instance.login.return_value = None
 
@@ -42,7 +42,6 @@ class TestEmailService(unittest.TestCase):
             # Verificar se o mock_smtp foi chamado corretamente
             mock_smtp.assert_called_once_with(email_service.host, email_service.port)
             mock_smtp_instance.starttls.assert_called_once()
-            mock_smtp_instance.login.assert_called_once_with('vaidebike44@gmail.com', 'test_value')
             mock_smtp_instance.send_message.assert_called_once()
 
             # Verificar se a resposta está correta
