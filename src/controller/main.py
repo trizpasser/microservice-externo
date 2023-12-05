@@ -32,11 +32,25 @@ email = EmailService()
 def hello_world():
     return "Hello World :)"
 
-@app.route('/testeCobranca', methods=['POST']) # teste 
+@app.route('/testeEmail', methods=['POST']) # teste 
 def teste_email():
-    dados = request.json
+    dados_email = request.json
 
-    return cobranca.efetua_cobranca(dados)
+    destinatario = dados_email['destinatario']
+    assunto = dados_email['assunto']
+    mensagem = dados_email['mensagem']
+
+    return cobranca.requisita_enviar_email(destinatario, assunto, mensagem)
+
+@app.route('/testeCobranca', methods=['POST']) # teste 
+def teste_cobranca():
+    dados_cobranca = request.json
+
+    valor = dados_cobranca['valor']
+    ciclista = dados_cobranca['ciclista']
+
+    return cobranca.requisita_cobranca(valor, ciclista)
+
 
 @app.route('/enviarEmail', methods=['POST']) 
 def enviar_email_route():

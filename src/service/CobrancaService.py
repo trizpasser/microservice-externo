@@ -45,6 +45,27 @@ class CobrancaService:
 
         return lista
     
+    def requisita_cobranca(self, valor, ciclista):
+        url_cobranca = "https://microservice-externo-b4i7jmshsa-uc.a.run.app/cobranca"
+        
+        dados = {
+                 "valor": valor, 
+                 "ciclista": "12345"
+                 }
+        try:
+            response = requests.post(url_cobranca, json = dados)
+            response.raise_for_status()
+
+        # confere se a requisição retorna um json
+        except requests.exceptions.RequestException as e:
+            return (f"Erro na requisição: {e}")
+    
+        if response.status_code == 200:
+            return jsonify({"mensagem": "Requisição bem-sucedida"})
+        else:
+            return jsonify({"mensagem": "Erro na requisição", "status_code": response.status_code})
+        
+    
     def efetua_cobranca(self, valor): 
         stripe.api_key = self.api_key
         valor = int(valor * 100) # o amount é em centavos, então converte reais em centavos
@@ -219,7 +240,7 @@ class CobrancaService:
     #    return requests.get("http://127.0.0.1:8080")
                
 
-    def requisita_enviar_email(self, assunto, mensagem):
+    def requisita_enviar_email(self, destinatario, assunto, mensagem):  #o destinatario na vdd é o meu pq é o unico que recebe, mas vc pode tirar ele como hardcode e enviar como parametro
         url_email = "https://microservice-externo-b4i7jmshsa-uc.a.run.app/enviarEmail"
         
         dados = {"destinatario": "bqueiroz@edu.unirio.br", 
