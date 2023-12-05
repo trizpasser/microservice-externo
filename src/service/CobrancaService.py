@@ -155,7 +155,7 @@ class CobrancaService:
 
         fila.insere_cobranca(info_cobranca)
 
-        return fila.obtem_fila(), 200
+        return "Cobranca registrada como pendente", 200
 
     @repeat(every(12).hours)
     def processa_cobrancas_pendentes(self):

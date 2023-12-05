@@ -63,5 +63,17 @@ class TestController(unittest.TestCase):
 
         self.assertEqual(response.status_code, 200)
 
+    @patch('controller.main.inserir_cobranca_em_fila_route')
+    def teste_inserir_cobranca_em_fila_route_200(self, mock_inserir_cobranca_em_fila):
+        mock_inserir_cobranca_em_fila.return_value = "Cobranca registrada como pendente", 200
+        data = {"valor": 10, "ciclista": "123"}
+        response = self.client.get('/filaCobranca', headers={"Content-Type": "application/json"}, json=data)
+
+        self.assertEqual(response.status_code, 200)
+
+
+
+
+
 if __name__ == '__main__':
     unittest.main()
