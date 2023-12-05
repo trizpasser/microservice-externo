@@ -41,7 +41,7 @@ class TestController(unittest.TestCase):
        self.assertEqual(response.status_code, 500)
        
 
-    @patch('controller.main.cobranca.realizar_cobranca_route')
+    @patch('controller.main.realizar_cobranca_route')
     def test_realizar_cobranca_route_200(self, mock_realiza_cobranca):
         mock_realiza_cobranca.return_value = {
             "-Status-": "Cobrança realizada com sucesso!", 
@@ -57,15 +57,15 @@ class TestController(unittest.TestCase):
         self.assertEqual(response.status_code, 200)
         
 
-    @patch('controller.main.cobranca.processar_cobrancas_em_fila_route')
+    @patch('controller.main.processar_cobrancas_em_fila_route')
     def test_realizar_cobranca_route_200(self, mock):
         mock.return_value = "Todas as cobrancas foram quitadas!", 200
         data = {"valor": 100, "ciclista": "100"}
-        response = self.client.post('/processaCobrancaEmFila', headers={"Content-Type": "application/json"}, json=data)
+        response = self.client.post('/processaCobrancasEmFila', headers={"Content-Type": "application/json"}, json=data)
         self.assertEqual(response.status_code, 200)
 
     
-    @patch('controller.main.cobranca.inserir_cobranca_em_fila_route')
+    @patch('controller.main.inserir_cobranca_em_fila_route')
     def test_realizar_cobranca_route_422(self, mock):
         mock.return_value = {
              "codigo": 422,
