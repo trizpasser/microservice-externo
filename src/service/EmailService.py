@@ -29,7 +29,6 @@ class EmailService:
             destinatario = dados_email['destinatario'], 
             assunto = dados_email['assunto'], 
             mensagem = dados_email['mensagem'])
-
         try: 
             # Cria uma conexão com o servidor SMTP
             servidor = smtplib.SMTP(self.host, self.port)
