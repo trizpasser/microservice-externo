@@ -44,8 +44,8 @@ class TestController(unittest.TestCase):
     def test_realizar_cobranca_route_200(self, mock_realiza_cobranca):
         mock_realiza_cobranca.return_value = {
             "-Status-": "Cobrança realizada com sucesso!", 
-            "status:": "Paga"
-            "valor": 100
+            "status:": "Paga",
+            "valor": 100,
             "ciclista": "100"
             }
 
