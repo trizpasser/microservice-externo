@@ -56,7 +56,7 @@ class CobrancaService:
         
         dados = {
                  "valor": valor, 
-                 "ciclista": "12345"
+                 "ciclista": ciclista
                  }
         try:
             response = requests.post(url_cobranca, json = dados)
