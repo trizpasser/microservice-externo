@@ -10,7 +10,7 @@ project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
 sys.path.insert(0, project_root)
 
 from model.cobranca import Cobranca
-from model.cartao_credito import CartoDeCredito
+from model.cartao_credito import CartaoDeCredito
 
 class CobrancaService: 
     load_dotenv()
@@ -93,6 +93,11 @@ class CobrancaService:
             status = Status.OCUPADA, 
             hora_finalizacao = None, 
             hora_solicitacao = datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
+        
+
+
+
+        
 
         if cobranca.valor <= 0 or cobranca.valor is None or cobranca.ciclista is None:
             erro = [
@@ -103,8 +108,13 @@ class CobrancaService:
         ]
             return erro, 422
 
-        #cartao = self.obtem_dados_cartao(cobranca.ciclista)
-        #add cartao = CartaoDeCredito()
+        dados_cartao = self.obtem_dados_cartao(cobranca.ciclista)
+
+        cartao = CartaoDeCredito(
+            nome_titular = dados_cartao['nome_titular'],
+            numero = dados_cartao['numero'],
+            validade = dados_cartao['validade'],
+            cvv = dados_cartao['cvv'] )
 
         if self.efetua_cobranca(cobranca.valor): 
             cobranca.id = random.randint(1,1000) # gera um id aleatorio
@@ -141,24 +151,24 @@ class CobrancaService:
     
     def obtem_dados_cartao(self, ciclista):
 
+        url_dados_cartao = "https://microservice-aluguel-hm535ksnoq-uc.a.run.app/cartaoDeCredito/" + ciclista
 
-        #url_dados_cartao = "https://microservice-aluguel-hm535ksnoq-uc.a.run.app/CartaoDeCredito/{ciclista}"
-
-       #try:
-        #    response = requests.get(url_dados_cartao)
+        try:
+            response = requests.get(url_dados_cartao)
 
             # Verifica se a requisição foi bem-sucedida (status code 2xx)
-        #    if response.ok:
+            if response.ok:
                 # A resposta do microsserviço de destino está em response.text ou response.json()
-         #       resultado = response.json()
-          #      return response
-          #  else:
-           #     return jsonify({"status": "error", "mensagem": f"Falha na requisição: {str(e)}"})
+                resultado = response.json()
+                return resultado
+            else:
+                
+                return jsonify("Erro:", response.status_code)
 
-        #except Exception as e:
-         #   return jsonify ({"status": "error", "mensagem": f"Erro na requisição: {str(e)}"})
+        except Exception as e:
+            return jsonify ({"status": "error", "mensagem": f"Erro na requisição: {str(e)}"})
         
-        return 0
+
     
     def insere_cobranca_na_fila(self, dados_cobranca):
         cobranca = Cobranca(
@@ -218,7 +228,7 @@ class CobrancaService:
             
 
     def valida_cartao(self, dados_cartao):
-        cartao = CartoDeCredito(
+        cartao = CartaoDeCredito(
             nome_titular = dados_cartao['nome_titular'], 
             numero = dados_cartao['numero'], 
             validade = dados_cartao['validade'], 

@@ -51,6 +51,12 @@ def teste_cobranca():
 
     return cobranca.requisita_cobranca(valor, ciclista)
 
+@app.route('/testeIntegracao', methods=['POST']) # teste 
+def teste_integraca():
+    dados_ciclista = request.json
+    ciclista = dados_ciclista['ciclista']
+
+    return cobranca.obtem_dados_cartao(ciclista)
 
 @app.route('/enviarEmail', methods=['POST']) 
 def enviar_email_route():
@@ -94,4 +100,3 @@ def validar_cartao_route():
 
 if __name__ == '__main__':
     app.run(port=int(os.environ.get("PORT", 8080)),host='0.0.0.0',debug=True)
-    #cobranca.agendamento()
