@@ -16,11 +16,9 @@ class TestController(unittest.TestCase):
 
     @patch('controller.main.enviar_email_route')
     def test_enviar_email_route_200(self, mock_enviar_email):
-       email_json = {"destinatario": "bqueiroz@edu.unirio.br", "assunto": "teste unitario", "mensagem": "corpo do teste de email"}
-       mock_enviar_email.return_value = {
-        "mensagem": "Email enviado com sucesso!",
-        "status": "success"}
-       response = self.client.post('/enviarEmail', headers={"Content-Type": "application/json"}, json=email_json )
+       email_json.j = 
+       mock_enviar_email.return_value = {"mensagem": "Email enviado com sucesso!","status": "success"}
+       response = self.client.post('/enviarEmail', headers={"Content-Type": "application/json"}, {"destinatario": "bqueiroz@edu.unirio.br", "assunto": "teste unitario", "mensagem": "corpo do teste de email"})
 
        self.assertEqual(response.status_code, 200)
        self.assertEqual(response, mock_enviar_email.return_value)
@@ -33,7 +31,7 @@ class TestController(unittest.TestCase):
        email_json = {"destinatario": "", "assunto": "teste unitario", "mensagem": "corpo do teste de email"}
       
 
-       response = self.client.post('/enviarEmail', headers={"Content-Type": "application/json"}, json=email_json )
+       response = self.client.post('/enviarEmail', headers={"Content-Type": "application/json"}, {"destinatario": "bqueiroz@edu.unirio.br", "assunto": "teste unitario", "mensagem": "corpo do teste de email"} )
 
        self.assertEqual(response.status_code, 500)
        
@@ -72,7 +70,7 @@ class TestController(unittest.TestCase):
         data = {"valor": "ad" , "ciclista": ""}
         
         response = self.client.post('/filaCobranca', headers={"Content-Type": "application/json"}, json=data)
-        self.assertEqual(response.return_value, mock.return_value)
+        self.assertEqual(response, mock.return_value)
 
 
 if __name__ == '__main__':
