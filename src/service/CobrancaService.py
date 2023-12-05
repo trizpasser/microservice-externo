@@ -20,6 +20,29 @@ class CobrancaService:
         self.thread_agendamento.daemon = True  
         self.thread_agendamento.start()
     
+    
+    def lista_cobrancas(self): #remover antes dos testes
+        lista = [
+                {
+                    "id": 1,
+                    "ciclista": "123",
+                    "status": "Pago",
+                    "horaSolicitacao": "2023-11-13 02:14:39",
+                    "horaFinalizacao": "2023-11-13 02:19:39",
+                    "valor": 20.0
+                },
+                {
+                    "id": 2,
+                    "ciclista": "456",
+                    "status": "Pago",
+                    "horaSolicitacao": "2023-11-13 02:14:39",
+                    "horaFinalizacao": "2023-11-13 02:19:39",
+                    "valor": 35.5
+                },
+            ]
+        
+        return lista
+
 
     def efetua_cobranca(self, valor, dados_cartao): 
         if dados_cartao.get('ok'):

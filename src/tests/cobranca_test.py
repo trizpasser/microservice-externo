@@ -98,7 +98,7 @@ class TestCobrancaService(unittest.TestCase):
         mock.return_value = {"meio_de_pagamento":{"cvv":"132","nome_titular":"Fulano Beltrano Quatro","numero":"4012001037141112","validade":"2022-12"}}
         mock.return_value.status_code = 200
 
-        resultado = cobranca.obtem_dados_cartao(4)
+        resultado = self.cobranca.obtem_dados_cartao(4)
         self.assertEqual(mock.return_value, resultado)
         self.assertEqual(mock.return_value.status_code, resultado.status_code)
 
