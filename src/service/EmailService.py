@@ -23,7 +23,7 @@ class EmailService:
     def envia_email(self, dados_email):
         client = secretmanager.SecretManagerServiceClient()
         project_id = "microservice-externo"
-        parent = f"projects/{project_id}"
+      
     
         email = Email(
             destinatario = dados_email['destinatario'], 
