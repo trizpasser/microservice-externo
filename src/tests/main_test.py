@@ -31,7 +31,7 @@ class TestController(unittest.TestCase):
        email_json = {"destinatario": "", "assunto": "teste unitario", "mensagem": "corpo do teste de email"}
       
 
-       response = self.client.post('/enviarEmail', headers={"Content-Type": "application/json"}, {"destinatario": "bqueiroz@edu.unirio.br", "assunto": "teste unitario", "mensagem": "corpo do teste de email"} )
+       response = self.client.post('/enviarEmail', headers={"Content-Type": "application/json"}, json= {"destinatario": "bqueiroz@edu.unirio.br", "assunto": "teste unitario", "mensagem": "corpo do teste de email"} )
 
        self.assertEqual(response.status_code, 500)
        
