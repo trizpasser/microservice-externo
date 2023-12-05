@@ -22,6 +22,12 @@ class CobrancaService:
         self.thread_agendamento.daemon = True  # Define a thread como um daemon para que ela seja encerrada quando o programa principal terminar
         self.thread_agendamento.start()
 
+    def busca_secrets_keys(self, name_key):
+        client = secretmanager.SecretManagerServiceClient()   
+        path = f"projects/microservice-externo/secrets/{name_key}/versions/latest"
+        response = client.access_secret_version(name=path)
+        return response.payload.data.decode("UTF-8")
+
     def lista_cobrancas(self): #remover antes dos testes
         lista = [
                 {
@@ -135,11 +141,7 @@ class CobrancaService:
             self.insere_cobranca_na_fila(info_cobranca)
             return "Falha na cobrança, tentaremos mais tarde."
 
-    def busca_secrets_keys(self, name_key):
-        client = secretmanager.SecretManagerServiceClient()   
-        path = f"projects/microservice-externo/secrets/{name_key}/versions/latest"
-        response = client.access_secret_version(name=path)
-        return response.payload.data.decode("UTF-8")
+    
     
     def obtem_dados_cartao(self, ciclista):
 
@@ -246,10 +248,10 @@ class CobrancaService:
             time.sleep(1)
     
 
-    def requisita_enviar_email(self, destinatario, assunto, mensagem):  #o destinatario na vdd é o meu pq é o unico que recebe, mas vc pode tirar ele como hardcode e enviar como parametro
+    def requisita_enviar_email(self, destinatario, assunto, mensagem): 
         url_email = "https://microservice-externo-b4i7jmshsa-uc.a.run.app/enviarEmail"
         
-        dados = {"destinatario": "bqueiroz@edu.unirio.br", 
+        dados = {"destinatario": destinatario, 
                  "assunto": assunto, 
                  "mensagem": mensagem
                  }
