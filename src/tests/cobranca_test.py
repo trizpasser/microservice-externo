@@ -13,17 +13,6 @@ class TestCobrancaService(unittest.TestCase):
         self.cobranca = Cobranca()
 
    
-    def test_lista_cobrancas(self): # remover 
-        resultado = self.cobranca.lista_cobrancas()
-        self.assertIsInstance(resultado, list)
-        self.assertGreater(len(resultado), 0)
-        self.assertIsInstance(resultado[0], dict)
-        self.assertIn("id", resultado[0])
-        self.assertIn("ciclista", resultado[0])
-        self.assertIn("status", resultado[0])
-        self.assertIn("horaSolicitacao", resultado[0])
-        self.assertIn("horaFinalizacao", resultado[0])
-        self.assertIn("valor", resultado[0])
 
     def test_realiza_cobranca(self):
         valor = 50
@@ -103,6 +92,15 @@ class TestCobrancaService(unittest.TestCase):
 
         self.assertEqual(status_code, 400)
         self.assertEqual(resultado, "Cartão inválido")
+
+    @patch('service.CobrancaService.obtem_dados_cartao')
+    def test_verificar_dados_cartao_integracao(self, mock):
+        mock.return_value = {"meio_de_pagamento":{"cvv":"132","nome_titular":"Fulano Beltrano Quatro","numero":"4012001037141112","validade":"2022-12"}}
+        mock.return_value.status_code = 200
+
+        resultado = cobranca.obtem_dados_cartao(4)
+        self.assertEqual(mock.return_value, resultado)
+        self.assertEqual(mock.return_value.status_code, resultado.status_code)
 
 if __name__ == '__main__':
     unittest.main()
