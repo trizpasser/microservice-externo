@@ -27,50 +27,6 @@ class CobrancaService:
         path = f"projects/microservice-externo/secrets/{name_key}/versions/latest"
         response = client.access_secret_version(name=path)
         return response.payload.data.decode("UTF-8")
-
-    def lista_cobrancas(self): #remover antes dos testes
-        lista = [
-                {
-                    "id": 1,
-                    "ciclista": "123",
-                    "status": "Pago",
-                    "horaSolicitacao": "2023-11-13 02:14:39",
-                    "horaFinalizacao": "2023-11-13 02:19:39",
-                    "valor": 20.0
-                },
-                {
-                    "id": 2,
-                    "ciclista": "456",
-                    "status": "Pago",
-                    "horaSolicitacao": "2023-11-13 02:14:39",
-                    "horaFinalizacao": "2023-11-13 02:19:39",
-                    "valor": 35.5
-                },
-            ]
-        
-
-        return lista
-    
-    def requisita_cobranca(self, valor, ciclista):
-        url_cobranca = "https://microservice-externo-b4i7jmshsa-uc.a.run.app/cobranca"
-        
-        dados = {
-                 "valor": valor, 
-                 "ciclista": ciclista
-                 }
-        try:
-            response = requests.post(url_cobranca, json = dados)
-            response.raise_for_status()
-
-        # confere se a requisição retorna um json
-        except requests.exceptions.RequestException as e:
-            return (f"Erro na requisição: {e}")
-    
-        if response.status_code == 200:
-            return jsonify({"mensagem": "Requisição bem-sucedida"})
-        else:
-            return jsonify({"mensagem": "Erro na requisição", "status_code": response.status_code})
-        
     
 
     def efetua_cobranca(self, valor, dados_cartao): 
@@ -92,6 +48,26 @@ class CobrancaService:
         except Exception as e:
 
             return False, jsonify({"status": "error", "mensagem": f"Erro ao realizar cobrança: {str(e)}"})
+        
+
+    def obtem_dados_cartao(self, ciclista):
+
+        url_dados_cartao = "https://microservice-aluguel-hm535ksnoq-uc.a.run.app/cartaoDeCredito/" + ciclista
+
+        try:
+            response = requests.get(url_dados_cartao)
+
+            # Verifica se a requisição foi bem-sucedida (status code 2xx)
+            if response.ok:
+                # A resposta do microsserviço de destino está em response.text ou response.json()
+                resultado = response.json()
+                return resultado
+            else:
+                
+                return jsonify("Erro:", response.status_code)
+
+        except Exception as e:
+            return jsonify ({"status": "error", "mensagem": f"Erro na requisição: {str(e)}"})
 
 
     def realiza_cobranca(self, dados_cobranca):
@@ -140,28 +116,6 @@ class CobrancaService:
 
             self.insere_cobranca_na_fila(info_cobranca)
             return "Falha na cobrança, tentaremos mais tarde."
-
-    
-    
-    def obtem_dados_cartao(self, ciclista):
-
-        url_dados_cartao = "https://microservice-aluguel-hm535ksnoq-uc.a.run.app/cartaoDeCredito/" + ciclista
-
-        try:
-            response = requests.get(url_dados_cartao)
-
-            # Verifica se a requisição foi bem-sucedida (status code 2xx)
-            if response.ok:
-                # A resposta do microsserviço de destino está em response.text ou response.json()
-                resultado = response.json()
-                return resultado
-            else:
-                
-                return jsonify("Erro:", response.status_code)
-
-        except Exception as e:
-            return jsonify ({"status": "error", "mensagem": f"Erro na requisição: {str(e)}"})
-        
 
     
     def insere_cobranca_na_fila(self, dados_cobranca):
@@ -246,28 +200,6 @@ class CobrancaService:
         while True:
             schedule.run_pending()
             time.sleep(1)
-    
-
-    def requisita_enviar_email(self, destinatario, assunto, mensagem): 
-        url_email = "https://microservice-externo-b4i7jmshsa-uc.a.run.app/enviarEmail"
-        
-        dados = {"destinatario": destinatario, 
-                 "assunto": assunto, 
-                 "mensagem": mensagem
-                 }
-        try:
-            response = requests.post(url_email, json = dados)
-            response.raise_for_status()
-
-        # confere se a requisição retorna um json
-        except requests.exceptions.RequestException as e:
-            return (f"Erro na requisição: {e}")
-    
-        if response.status_code == 200:
-            return jsonify({"mensagem": "Requisição bem-sucedida"})
-        else:
-            return jsonify({"mensagem": "Erro na requisição", "status_code": response.status_code})
-
 
 class Fila:
 
@@ -295,5 +227,3 @@ class Status(Enum):
     FALHA = "Falha"
     CANCELADA = "Cancelada"
     OCUPADA = "Ocupada"
-
-

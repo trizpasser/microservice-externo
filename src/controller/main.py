@@ -17,31 +17,6 @@ email = EmailService()
 def hello_world():
     return "Hello World :)"
 
-@app.route('/testeEmail', methods=['POST']) # teste 
-def teste_email():
-    dados_email = request.json
-
-    destinatario = dados_email['destinatario']
-    assunto = dados_email['assunto']
-    mensagem = dados_email['mensagem']
-
-    return cobranca.requisita_enviar_email(destinatario, assunto, mensagem)
-
-@app.route('/testeCobranca', methods=['POST']) # teste 
-def teste_cobranca():
-    dados_cobranca = request.json
-
-    valor = dados_cobranca['valor']
-    ciclista = dados_cobranca['ciclista']
-
-    return cobranca.requisita_cobranca(valor, ciclista)
-
-@app.route('/testeIntegracao', methods=['POST']) # teste 
-def teste_integraca():
-    dados_ciclista = request.json
-    ciclista = dados_ciclista['ciclista']
-
-    return cobranca.obtem_dados_cartao(ciclista)
 
 @app.route('/enviarEmail', methods=['POST']) 
 def enviar_email_route():
