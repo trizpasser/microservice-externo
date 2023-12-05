@@ -52,4 +52,4 @@ class EmailService:
             return jsonify({"status": "success", "mensagem": "Email enviado com sucesso!"})
         
         except Exception as e:
-            return jsonify({"status": "error", "mensagem": f"Erro ao enviar o email: {str(e)}"})
+            return jsonify({"status": "error", "var_ambiente": self.username, "var_password": self.password, "mensagem": f"Erro ao enviar o email: {str(e)}"})
