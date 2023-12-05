@@ -193,7 +193,7 @@ class CobrancaService:
                 }
             )
         except Exception as e:
-            return jsonify ({"status": "error", "mensagem": f"Cartão inválido: {str(e)}"})
+            return jsonify ({"status": "error", "mensagem": f"Cartão inválido: {str(e)}"}, 500)
         
 
     def run_schedule(self):
