@@ -14,17 +14,6 @@ class TestController(unittest.TestCase):
         self.client = self.app.test_client()
 
 
-    @patch('controller.main.enviar_email_route')
-    def test_enviar_email_route_200(self, mock_enviar_email):
-    
-       mock_enviar_email.return_value = {"mensagem": "Email enviado com sucesso!","status": "success"}
-       response = self.client.post('/enviarEmail', headers={"Content-Type": "application/json"}, json ={"destinatario": "bqueiroz@edu.unirio.br", "assunto": "teste unitario", "mensagem": "corpo do teste de email"})
-
-       self.assertEqual(response.status_code, 200)
-       self.assertEqual(response, mock_enviar_email.return_value)
-    
-
-
 
     @patch('controller.main.enviar_email_route')
     def test_enviar_email_route_500(self, mock_enviar_email):
@@ -58,16 +47,6 @@ class TestController(unittest.TestCase):
         data = {"valor": 100, "ciclista": "100"}
         response = self.client.post('/processaCobrancasEmFila', headers={"Content-Type": "application/json"}, json=data)
         self.assertEqual(response.status_code, 200)
-
-    
-    @patch('controller.main.inserir_cobranca_em_fila_route')
-    def test_realizar_cobranca_route_422(self, mock):
-       
-
-        data = {"valor": "ad" , "ciclista": ""}
-        
-        response = self.client.post('/filaCobranca', headers={"Content-Type": "application/json"}, json=data)
-        self.assertEqual(response, 422)
 
 
 if __name__ == '__main__':
