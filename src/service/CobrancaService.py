@@ -29,7 +29,7 @@ class CobrancaService:
                     "status": "Pago",
                     "horaSolicitacao": "2023-11-13 02:14:39",
                     "horaFinalizacao": "2023-11-13 02:19:39",
-                    "valor": 10.0
+                    "valor": 20.0
                 },
                 {
                     "id": 2,
@@ -37,7 +37,7 @@ class CobrancaService:
                     "status": "Pago",
                     "horaSolicitacao": "2023-11-13 02:14:39",
                     "horaFinalizacao": "2023-11-13 02:19:39",
-                    "valor": 25.5
+                    "valor": 35.5
                 },
             ]
         
