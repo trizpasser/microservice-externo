@@ -67,7 +67,10 @@ class CobrancaService:
         
     
 
-    def efetua_cobranca(self, valor): 
+    def efetua_cobranca(self, valor, dados_cartao): 
+        if dados_cartao.ok:
+            print("Dados ok")
+
         stripe.api_key = self.busca_secrets_keys('STRIPE_PRIVATE_KEY')
         valor = int(valor * 100) # o amount é em centavos, então converte reais em centavos
     
@@ -106,7 +109,7 @@ class CobrancaService:
 
         dados_cartao = self.obtem_dados_cartao(cobranca.ciclista)
 
-        if self.efetua_cobranca(cobranca.valor): 
+        if self.efetua_cobranca(cobranca.valor, dados_cartao): 
             cobranca.id = random.randint(1,1000) # gera um id aleatorio
             cobranca.status = Status.PAGA
             cobranca.hora_finalizacao = (datetime.now() + timedelta(minutes=5)).strftime("%Y-%m-%d %H:%M:%S")
@@ -219,10 +222,13 @@ class CobrancaService:
             
 
     def valida_cartao(self, dados_cartao):
+        if dados_cartao.ok:
+            print("Dados ok")
+
         stripe.api_key = self.busca_secrets_keys('STRIPE_PRIVATE_KEY')
 
         try:
-            token = stripe.Token.create(
+            stripe.Token.create(
                 card={  # teste stripe
                     'number': '4000056655665556',  
                     'exp_month': '12',
