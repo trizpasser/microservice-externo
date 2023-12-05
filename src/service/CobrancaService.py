@@ -124,20 +124,13 @@ class CobrancaService:
             return info_cobranca, 200
         
         else:
-            self.insere_cobranca_na_fila(cobranca.valor, cobranca.ciclista)
+            info_cobranca = {
+                "valor": cobranca.valor,
+                "ciclista": cobranca.ciclista 
+            }
+
+            self.insere_cobranca_na_fila(info_cobranca)
             return "Falha na cobrança, tentaremos mais tarde."
-
-
-        #se não for realizada:
-        #cobranca.status = Status.FALHA
-        #info_cobranca = {
-        #    "status": cobranca.status.value,
-        #    "horaSolicitacao": cobranca.hora_solicitacao,
-        #    "valor": cobranca.valor,
-        #    "ciclista": cobranca.ciclista
-        #}
-        #insere_cobranca_na_fila(cobranca.valor, cobranca.ciclista)
-        # return info_cobranca, 500
 
     def busca_secrets_keys(self, name_key):
         client = secretmanager.SecretManagerServiceClient()   
@@ -185,10 +178,7 @@ class CobrancaService:
             return erro, 422
 
         info_cobranca = {
-        #    "id": cobranca.id,
             "status": cobranca.status.value,
-        #    "horaSolicitacao": cobranca.hora_solicitacao,
-        #    "horaFinalizacao": "-", 
             "valor": cobranca.valor,
             "ciclista": cobranca.ciclista
         }
@@ -209,7 +199,12 @@ class CobrancaService:
                 valor = cobranca_pendente["valor"]
                 ciclista = cobranca_pendente["ciclista"]
 
-                self.realiza_cobranca(valor, ciclista)
+                info_cobranca = {
+                "valor": valor,
+                "ciclista": ciclista
+                 }
+
+                self.realiza_cobranca(info_cobranca)
                 
             return "Todas as cobrancas foram quitadas!", 200
 
@@ -244,10 +239,6 @@ class CobrancaService:
             schedule.run_pending()
             time.sleep(1)
     
-    #@repeat(every(5).seconds)
-    #def agendamento_teste():
-    #    return requests.get("http://127.0.0.1:8080")
-               
 
     def requisita_enviar_email(self, destinatario, assunto, mensagem):  #o destinatario na vdd é o meu pq é o unico que recebe, mas vc pode tirar ele como hardcode e enviar como parametro
         url_email = "https://microservice-externo-b4i7jmshsa-uc.a.run.app/enviarEmail"
