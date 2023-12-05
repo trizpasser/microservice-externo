@@ -16,7 +16,7 @@ class TestController(unittest.TestCase):
 
     @patch('controller.main.enviar_email_route')
     def test_enviar_email_route_200(self, mock_enviar_email):
-       email_json.j = 
+    
        mock_enviar_email.return_value = {"mensagem": "Email enviado com sucesso!","status": "success"}
        response = self.client.post('/enviarEmail', headers={"Content-Type": "application/json"}, {"destinatario": "bqueiroz@edu.unirio.br", "assunto": "teste unitario", "mensagem": "corpo do teste de email"})
 
