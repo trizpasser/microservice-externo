@@ -32,7 +32,7 @@ class TestController(unittest.TestCase):
             "status:": "Paga",
             "valor": 100,
             "ciclista": "100"
-            }
+        }
 
         data = {"valor": 100, "ciclista": "100"}
 
@@ -47,6 +47,32 @@ class TestController(unittest.TestCase):
         data = {"valor": 100, "ciclista": "100"}
         response = self.client.post('/processaCobrancasEmFila', headers={"Content-Type": "application/json"}, json=data)
         self.assertEqual(response.status_code, 200)
+
+    
+    @patch('controller.main.obter_cobranca_route')
+    def teste_obter_cobranca_route_200(self, mock_obter_cobranca):
+        mock_obter_cobranca.return_value = {
+        
+            "id": 1,
+            "ciclista": "123",
+            "status": "Pago",
+            "horaSolicitacao": "2023-11-13 02:14:39",
+            "horaFinalizacao": "2023-11-13 02:19:39",
+            "valor": 20.0
+        }
+
+        response = self.client.get('/cobranca/1')
+        self.assertEqual(response.status_code, 200)
+
+        cobranca_esperada = {
+            "id": 1,
+            "ciclista": "123",
+            "status": "Pago",
+            "horaSolicitacao": "2023-11-13 02:14:39",
+            "horaFinalizacao": "2023-11-13 02:19:39",
+            "valor": 20.0
+        }
+        self.assertDictEqual(response.json, cobranca_esperada)
 
 
 if __name__ == '__main__':
