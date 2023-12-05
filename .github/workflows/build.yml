@@ -27,6 +27,7 @@ jobs:
       - name: Run tests and coverage
         run: |
          coverage run src/tests/integracao.py
+         coverage run src/tests/main_test.py
          coverage xml -o coverage.xml
         continue-on-error: true
 
