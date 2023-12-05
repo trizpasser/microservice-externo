@@ -1,5 +1,6 @@
 import unittest
 from unittest.mock import MagicMock
+from unittest.mock import patch
 from flask import Flask
 import os, sys
 project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
@@ -16,7 +17,7 @@ class TestController(unittest.TestCase):
         response = self.app.get('/')
         self.assertEqual(response.data.decode('utf-8'), "Hello World! :)")
 
-    
+    @patch('controller.main.enviar_email_route')
     def test_enviar_email_route_200(self, mock_enviar_email):
        email_json = {"destinatario": "bqueiroz@edu.unirio.br", "assunto": "teste unitario", "mensagem": "corpo do teste de email"}
        mock_enviar_email.return_value = {
